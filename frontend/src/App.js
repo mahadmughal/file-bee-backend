@@ -2,7 +2,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import NavBar from './components/NavBar';
-import UploadFile from './components/UploadFile';
+import DocumentConversion from './components/DocumentConversion';
 import './App.css';
 
 function App() {
@@ -10,7 +10,7 @@ function App() {
     <BrowserRouter>
       <NavBar />
       <Routes>
-        <Route path="/" element={<UploadFile />} />
+        <Route path="/" element={<DocumentConversion />} />
       </Routes>
     </BrowserRouter>
   );

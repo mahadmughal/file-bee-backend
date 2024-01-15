@@ -38,30 +38,10 @@ def upload_and_create_document(request):
         return JsonResponse({'error': 'unable to convert file'})
 
 
-def download_document(request, document_conversion_id):
-    document_conversion = get_object_or_404(
-        DocumentConversion, id=document_conversion_id
-    )
-    document = document_conversion.original_file
-
-    with open(document.path, "rb") as f:
-        response = HttpResponse(f.read(), content_type="application/force-download")
-        response["Content-Disposition"] = 'attachment; filename="{}"'.format(
-            document.name
-        )
-        return response
-
-
 def target_conversions(request):
-    original_mimetype = request.GET.get("original_mimetype")
+    supported_conversions = SupportedConversion.get_available_conversions_for_all_sources()
 
-    if original_mimetype:
-        supported_mimetypes = SupportedConversion.get_available_conversions_for_source(
-            original_mimetype
-        )
-        return JsonResponse({"supported_mimetypes": list(supported_mimetypes)})
-    else:
-        return JsonResponse({"error": "Missing required parameter: original_mimetype"})
+    return JsonResponse({ 'supported_conversions': supported_conversions })
 
 
 def index(request):

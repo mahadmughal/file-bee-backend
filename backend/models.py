@@ -1,6 +1,6 @@
 from django.db import models
 from django.core.files import File
-from backend import mimetype_converter
+from backend.mimetype_converter import MimetypeConverter
 import datetime
 import pdb
 
@@ -42,7 +42,8 @@ class DocumentConversion(models.Model):
         }
 
     def conversion(self):
-        converted_file_path = mimetype_converter.convert(self.original_mimetype, self.converted_mimetype, self.original_file)
+        mimetype_converter = MimetypeConverter(self.original_mimetype, self.converted_mimetype, self.original_file)
+        converted_file_path = mimetype_converter.convert()
 
         self.converted_file = File(open(converted_file_path, 'rb'))
         self.converted_filename = self.converted_file.name.split('/')[-1]
@@ -57,6 +58,10 @@ class SupportedConversion(models.Model):
     original_mimetype = models.CharField(max_length=100)
     target_mimetype = models.CharField(max_length=100)
     available = models.BooleanField(default=True)
+    
+    @classmethod
+    def get_available_conversions(cls):
+        return cls.objects.filter(available=True)
 
     @classmethod
     def is_conversion_available(cls, original_mimetype, target_mimetype):
@@ -72,10 +77,22 @@ class SupportedConversion(models.Model):
             original_mimetype__contains=original_mimetype,
             available=True
         ).values_list("target_mimetype", flat=True)
-    
+        
     @classmethod
-    def get_available_conversions(cls):
-        return cls.objects.filter(available=True)
+    def get_available_conversions_for_all_sources(cls):
+        available_conversions = cls.get_available_conversions()
+        conversion_dict = {}
+        
+        for conversion in available_conversions:
+            original_mimetype = conversion.original_mimetype
+            target_mimetype = conversion.target_mimetype
+
+            if original_mimetype not in conversion_dict:
+                conversion_dict[original_mimetype] = []
+
+            conversion_dict[original_mimetype].append(target_mimetype)
+            
+        return conversion_dict
 
     def __str__(self):
         return f"original_mimetype={self.original_mimetype}, target_mimetype={self.target_mimetype}, available={self.available}"
