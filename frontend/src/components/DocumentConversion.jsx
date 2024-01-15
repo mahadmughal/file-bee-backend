@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import '../App.css'
-import $ from 'jquery';
 
 function DocumentConversion() {
     const [conversionData, setConversionData] = useState([])
@@ -85,17 +84,11 @@ function DocumentConversion() {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
 
-            const data = await response.blob();
+            const blob = await response.blob();
             const headers = response.headers;
-
-            const blob = new Blob([data]);
             const contentType = headers.get('content-type').split('/').pop();
-            console.log('content type: ', data);
-
             const fileDownloadUrl = URL.createObjectURL(blob);
             const convertedFileName = `converted_${conversionIndex}.${contentType}`;
-
-            // console.log(`conversion_${conversionIndex}`, conversion);
 
             return { fileDownloadUrl: fileDownloadUrl, convertedFileName: convertedFileName };
 
@@ -116,6 +109,10 @@ function DocumentConversion() {
 
         try {
             await Promise.all(conversions.map(async (conversion, index) => {
+                if (conversion.fileDownloadUrl === undefined) {
+                    return;
+                }
+
                 const { fileDownloadUrl, convertedFileName } = await handleConversionRequest(conversion, index);
     
                 const updatedConversion = {
