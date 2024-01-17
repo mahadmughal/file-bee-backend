@@ -12,6 +12,7 @@ class MimetypeConverter:
         output_file_path = self.generate_output_path()
 
         if self.source_mimetype == 'image/png' and self.target_mimetype == 'image/jpeg':
+            image = image.convert('RGB')
             image.save(output_file_path, 'JPEG', quality=95)
         elif (self.source_mimetype == 'image/jpeg' or self.source_mimetype == 'image/png') and self.target_mimetype == 'image/bmp':
             image = image.convert(mode="P", palette=Image.ADAPTIVE, colors=256)

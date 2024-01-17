@@ -5,6 +5,13 @@ function DocumentConversion() {
     const [conversionData, setConversionData] = useState([])
     const [supportedConversions, setSupportedConversions] = useState({});
 
+    const conversionStatus = {
+        ready: { badgeColor: 'info', badgeText: 'ready' },
+        processing: { badgeColor: 'primary', badgeText: 'processing' },
+        completed: { badgeColor: 'success', badgeText: 'completed' },
+        failed: { badgeColor: 'danger', badgeText: 'failed' }
+    }
+
     useEffect(() => {
         // This code will run once when the component is mounted
 
@@ -81,7 +88,7 @@ function DocumentConversion() {
             const response = await fetch(url, { method: 'POST', header, body: formData });
 
             if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
+                return {};
             }
 
             const blob = await response.blob();
@@ -109,16 +116,29 @@ function DocumentConversion() {
 
         try {
             await Promise.all(conversions.map(async (conversion, index) => {
-                if (conversion.fileDownloadUrl === undefined) {
+                if (conversion.fileDownloadUrl) {
                     return;
                 }
 
+                conversion = {
+                    ...conversion,
+                    status: 'processing'
+                }
+
+                // Use the functional state update form
+                setConversionData(prevConversions => {
+                    const updatedConversions = [...prevConversions];
+                    updatedConversions[index] = conversion;
+                    return updatedConversions;
+                });
+
                 const { fileDownloadUrl, convertedFileName } = await handleConversionRequest(conversion, index);
-    
+
                 const updatedConversion = {
                     ...conversion,
                     fileDownloadUrl: fileDownloadUrl,
-                    convertedFileName: convertedFileName
+                    convertedFileName: convertedFileName,
+                    status: (fileDownloadUrl ? 'completed' : 'failed')
                 }
 
                 // Use the functional state update form
@@ -127,7 +147,7 @@ function DocumentConversion() {
                     updatedConversions[index] = updatedConversion;
                     return updatedConversions;
                 });
-    
+
             }));
         } catch (error) {
             console.error('Error in one or more requests:', error);
@@ -196,21 +216,26 @@ function DocumentConversion() {
                                         </td>
                                         <td>
                                             <select className='form-control target-mimetypes' id={index} style={{ width: "70%" }} onChange={selectSupportedConversion}>
-                                                <option value="" required>Convert to format     ...</option>
+                                                <option value="" required>Convert to format ...</option>
                                                 {supportedConversions[fileObject.file.type]?.map((option, index) => (
                                                     <option key={index} value={option}>{option}</option>
                                                 ))}
                                             </select>
                                         </td>
                                         <td className="d-none d-sm-table-cell">
-                                            <span className="badge badge-primary">Ready</span>
+                                            <span className={`badge badge-${conversionStatus[fileObject.status].badgeColor}`}>{fileObject.status}</span>
+                                            {fileObject.status === 'processing' &&
+                                                <span className="spinner-border spinner-border-sm text-primary ml-2" role="status">
+                                                    <span className="sr-only">Loading...</span>
+                                                </span>
+                                            }
                                         </td>
                                         <td className="text-center">
                                             <div className="btn-group">
                                                 <button type="reset" className="btn btn-sm btn-danger mr-1" onClick={() => handleCancelConversion(index)}>
                                                     <i className="fa fa-fw fa-times"></i> Delete
                                                 </button>
-                                                { fileObject.fileDownloadUrl &&
+                                                {fileObject.fileDownloadUrl &&
                                                     <a href={fileObject.fileDownloadUrl ? fileObject.fileDownloadUrl : '#'} className="btn btn-sm btn-success" download={fileObject.convertedFileName ? fileObject.convertedFileName : ''}>
                                                         <i className="fa fa-fw fa-download"></i> Download
                                                     </a>
