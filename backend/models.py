@@ -2,6 +2,7 @@ from django.db import models
 from django.core.files import File
 from backend.mimetype_converter import MimetypeConverter
 import datetime
+import os
 import pdb
 
 # Create your models here.
@@ -25,7 +26,7 @@ class DocumentConversion(models.Model):
         ('expired', 'expired'),
         ('failed', 'failed'),
     ))
-    
+
     def to_dict(self):
         return {
             'original_file': str(self.original_file),
@@ -45,20 +46,20 @@ class DocumentConversion(models.Model):
         mimetype_converter = MimetypeConverter(self.original_mimetype, self.converted_mimetype, self.original_file)
         converted_file_path = mimetype_converter.convert()
 
-        self.converted_file = File(open(converted_file_path, 'rb'))
+        self.converted_file = File(open(os.path.relpath(converted_file_path, os.getcwd()), 'rb'))
         self.converted_filename = self.converted_file.name.split('/')[-1]
         self.completed_at = datetime.datetime.now()
         self.status = 'completed'
         self.save()
 
-    
+
 
 
 class SupportedConversion(models.Model):
     original_mimetype = models.CharField(max_length=100)
     target_mimetype = models.CharField(max_length=100)
     available = models.BooleanField(default=True)
-    
+
     @classmethod
     def get_available_conversions(cls):
         return cls.objects.filter(available=True)
@@ -70,19 +71,19 @@ class SupportedConversion(models.Model):
             target_mimetype=target_mimetype,
             available=True
         )
-    
+
     @classmethod
     def get_available_conversions_for_source(cls, original_mimetype):
         return cls.objects.filter(
             original_mimetype__contains=original_mimetype,
             available=True
         ).values_list("target_mimetype", flat=True)
-        
+
     @classmethod
     def get_available_conversions_for_all_sources(cls):
         available_conversions = cls.get_available_conversions()
         conversion_dict = {}
-        
+
         for conversion in available_conversions:
             original_mimetype = conversion.original_mimetype
             target_mimetype = conversion.target_mimetype
@@ -91,7 +92,7 @@ class SupportedConversion(models.Model):
                 conversion_dict[original_mimetype] = []
 
             conversion_dict[original_mimetype].append(target_mimetype)
-            
+
         return conversion_dict
 
     def __str__(self):

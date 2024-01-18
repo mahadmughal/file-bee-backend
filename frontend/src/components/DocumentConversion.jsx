@@ -101,6 +101,7 @@ function DocumentConversion() {
 
         } catch (error) {
             console.error('Fetch error:', error);
+            return {};
         }
     };
 
