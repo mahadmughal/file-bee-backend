@@ -93,9 +93,9 @@ function DocumentConversion() {
 
             const blob = await response.blob();
             const headers = response.headers;
-            const contentType = headers.get('content-type').split('/').pop();
+            const contentType = headers.get('content-type');
             const fileDownloadUrl = URL.createObjectURL(blob);
-            const convertedFileName = `converted_${conversionIndex}.${contentType}`;
+            const convertedFileName = `converted_${conversionIndex}.${supportedConversions[contentType].extension}`;
 
             return { fileDownloadUrl: fileDownloadUrl, convertedFileName: convertedFileName };
 
@@ -218,8 +218,8 @@ function DocumentConversion() {
                                         <td>
                                             <select className='form-control target-mimetypes' id={index} style={{ width: "70%" }} onChange={selectSupportedConversion}>
                                                 <option value="" required>Convert to format ...</option>
-                                                {supportedConversions[fileObject.file.type]?.map((option, index) => (
-                                                    <option key={index} value={option}>{option}</option>
+                                                {supportedConversions[fileObject.file.type]?.targetable_mimetypes?.map((target_mimetype, index) => (
+                                                    <option key={index} value={target_mimetype}>{supportedConversions[target_mimetype]?.extension}</option>
                                                 ))}
                                             </select>
                                         </td>
