@@ -1,5 +1,8 @@
 from PIL import Image
 from reportlab.pdfgen import canvas
+from pdf2docx import Converter
+import fitz  # PyMuPDF
+from docx import Document
 import os
 import pdb
 
@@ -10,8 +13,14 @@ class MimetypeConverter:
         self.file = file
 
     def convert(self):
+        if self.source_mimetype.startswith("image"):
+            return self.convert_image()
+        else:
+            return self.convert_file()
+
+    def convert_image(self):
         image = Image.open(self.file.name)
-        output_file_path = self.generate_output_path()
+        output_file_path = self.generate_output_file_path()
 
         if self.is_png_to_jpeg():
             image = image.convert('RGB')
@@ -40,17 +49,26 @@ class MimetypeConverter:
         elif self.is_webp_to_pdf():
             self.convert_image_to_pdf(image, output_file_path)
 
+
         return output_file_path
 
-    def generate_output_path(self):
+    def convert_file(self):
+        if self.is_pdf_to_docx():
+            output_file_path = self.generate_output_file_path('docx')
+            self.convert_pdf_to_docx(self.file.name, output_file_path)
+
+        return output_file_path
+
+    def generate_output_file_path(self, target_extension=None):
         # Get the directory part of the original file path
-        file_directory = os.path.dirname(self.file.path)
+        file_directory = os.path.dirname(self.file.name)
 
         # Get the filename part of the original file path
         file_name = os.path.basename(self.file.path)
+        target_extension = target_extension if target_extension else self.target_mimetype.split('/')[-1]
 
         # Construct the output file path in the same directory with a different extension
-        return os.path.join(file_directory, file_name.split('.')[0] + '.' + self.target_mimetype.split('/')[-1]).replace('uploaded', 'converted')
+        return (file_directory + '/' + file_name.split('.')[0] + '.' + target_extension).replace('uploaded', 'converted')
 
     def is_png_to_jpeg(self):
         return self.source_mimetype == 'image/png' and self.target_mimetype == 'image/jpeg'
@@ -88,14 +106,27 @@ class MimetypeConverter:
     def is_webp_to_pdf(self):
         return self.source_mimetype == 'image/webp' and self.target_mimetype == 'application/pdf'
 
+    def is_pdf_to_docx(self):
+        return self.source_mimetype == 'application/pdf' and self.target_mimetype == 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+
     def convert_image_to_pdf(self, input_image, output_file_path):
         print('converting png image to pdf file ...')
         pdf_canvas = canvas.Canvas(output_file_path, pagesize=input_image.size)
         pdf_canvas.drawInlineImage(self.file.name, 0, 0, width=input_image.width, height=input_image.height)
         pdf_canvas.save()
 
+    def convert_pdf_to_docx(self, pdf_path, docx_path):
+        cv = Converter(pdf_path)
+        cv.convert(docx_path)
+        cv.close()
 
 
-    # def generate_output_path(self):
+
+
+
+
+
+
+    # def generate_output_file_path(self):
         # return f"{self.file.path.split('.')[0]}.{self.target_mimetype.split('/')[-1]}".replace('uploaded', 'converted')
 

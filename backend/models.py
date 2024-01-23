@@ -46,7 +46,7 @@ class DocumentConversion(models.Model):
         mimetype_converter = MimetypeConverter(self.original_mimetype, self.converted_mimetype, self.original_file)
         converted_file_path = mimetype_converter.convert()
 
-        self.converted_file = File(open(os.path.relpath(converted_file_path, os.getcwd()), 'rb'))
+        self.converted_file = File(open(converted_file_path, 'rb'))
         self.converted_filename = self.converted_file.name.split('/')[-1]
         self.completed_at = datetime.datetime.now()
         self.status = 'completed'
@@ -58,7 +58,15 @@ class DocumentConversion(models.Model):
 class SupportedConversion(models.Model):
     original_mimetype = models.CharField(max_length=100)
     target_mimetype = models.CharField(max_length=100)
+    original_extension = models.CharField(max_length=50, null=True)
+    target_extension = models.CharField(max_length=50, null=True)
     available = models.BooleanField(default=True)
+
+    class Meta:
+        unique_together = (
+            ('original_mimetype', 'target_mimetype'),
+            ('original_extension', 'target_extension'),
+        )
 
     @classmethod
     def get_available_conversions(cls):
@@ -89,11 +97,13 @@ class SupportedConversion(models.Model):
             target_mimetype = conversion.target_mimetype
 
             if original_mimetype not in conversion_dict:
-                conversion_dict[original_mimetype] = []
+                conversion_dict[original_mimetype] = { 'targetable_mimetypes': [], 'extension': conversion.original_extension }
+            if target_mimetype not in conversion_dict:
+                conversion_dict[target_mimetype] = { 'targetable_mimetypes': [], 'extension':  conversion.target_extension }
 
-            conversion_dict[original_mimetype].append(target_mimetype)
+            conversion_dict[original_mimetype]['targetable_mimetypes'].append(target_mimetype)
 
         return conversion_dict
 
     def __str__(self):
-        return f"original_mimetype={self.original_mimetype}, target_mimetype={self.target_mimetype}, available={self.available}"
+        return f"original_mimetype={self.original_mimetype}, target_mimetype={self.target_mimetype}, original_extension={self.original_extension}, target_extension={self.target_extension}, available={self.available}"
