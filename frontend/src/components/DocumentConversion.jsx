@@ -92,8 +92,7 @@ function DocumentConversion() {
             }
 
             const blob = await response.blob();
-            const headers = response.headers;
-            const contentType = headers.get('content-type');
+            const contentType = response.headers.get('content-type');
             const fileDownloadUrl = URL.createObjectURL(blob);
             const convertedFileName = `converted_${conversionIndex}.${supportedConversions[contentType].extension}`;
 
