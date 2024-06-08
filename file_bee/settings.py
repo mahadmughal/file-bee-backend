@@ -81,7 +81,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'file_bee_development',      # Replace with your desired database name
-        'USER': 'mahad',      # Replace with your PostgreSQL username
+        'USER': 'postgres',      # Replace with your PostgreSQL username
         # 'PASSWORD': 'yourdbpassword',  # Replace with your PostgreSQL password
         'HOST': 'localhost',       # Replace with your PostgreSQL host
         'PORT': '5432',            # Replace with your PostgreSQL port
