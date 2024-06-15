@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import "../App.css";
 
-function DocumentConversion() {
+function FileConversion(props) {
+  const fileType = props.fileType
+
   const [conversionData, setConversionData] = useState([]);
   const [supportedConversions, setSupportedConversions] = useState({});
 
@@ -191,7 +193,7 @@ function DocumentConversion() {
       <div className="content content-full">
         <div className="d-flex flex-column justify-content-sm-between text-center">
           <div className="flex-sm-fill font-size-h2 font-w400 text-center text-info">
-            File Converter
+            {fileType} Converter
           </div>
           <div>Convert your files to any format</div>
         </div>
@@ -200,7 +202,7 @@ function DocumentConversion() {
       {conversionData.length > 0 && (
         <div className="block block-rounded block-bordered">
           <div className="block-header block-header-default">
-            <h3 className="block-title">Document Conversions</h3>
+            <h3 className="block-title">{fileType} Conversions</h3>
             <div className="block-options">
               <div className="block-options-item">
                 {/* <code>.table</code> */}
@@ -362,4 +364,4 @@ function DocumentConversion() {
   );
 }
 
-export default DocumentConversion;
+export default FileConversion;

@@ -33,34 +33,28 @@ const NavBar = () => {
                 </a>
                 <ul className="nav-main-submenu">
                   <li className="nav-main-item">
-                    <a className="nav-main-link" href="#">
+                    <Link to="/image_converter" className="nav-main-link">
                       <i className="nav-main-link-icon fa fa-images"></i>
-                      <span className="nav-main-link-name">
-                        Image Converter
-                      </span>
-                    </a>
+                      <span className="nav-main-link-name">Image Converter</span>
+                    </Link>
                   </li>
                   <li className="nav-main-item">
-                    <a className="nav-main-link" href="#">
+                    <Link to="/document_converter" className="nav-main-link">
                       <i className="nav-main-link-icon fa fa-file"></i>
-                      <span className="nav-main-link-name">
-                        Document Converter
-                      </span>
-                    </a>
+                      <span className="nav-main-link-name">Document Converter</span>
+                    </Link>
                   </li>
                   <li className="nav-main-item">
-                    <a className="nav-main-link" href="#">
+                    <Link to="/audio_converter" className="nav-main-link">
                       <i className="nav-main-link-icon fa fa-file-audio"></i>
-                      <span className="nav-main-link-name">
-                        Audio Converter
-                      </span>
-                    </a>
+                      <span className="nav-main-link-name">Audio Converter</span>
+                    </Link>
                   </li>
                   <li className="nav-main-item">
-                    <a className="nav-main-link" href="#">
+                    <Link to="/font_converter" className="nav-main-link">
                       <i className="nav-main-link-icon fa fa-font"></i>
                       <span className="nav-main-link-name">Font Converter</span>
-                    </a>
+                    </Link>
                   </li>
                 </ul>
               </li>
