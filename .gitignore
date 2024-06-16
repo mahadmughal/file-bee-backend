@@ -27,3 +27,4 @@
 /backend/__pycache__/
 /backend/migrations/__pycache__/
 /file_bee/__pycache__/
+__pycache__/
