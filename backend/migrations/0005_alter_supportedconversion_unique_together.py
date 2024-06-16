@@ -12,6 +12,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterUniqueTogether(
             name='supportedconversion',
-            unique_together={('original_extension', 'target_extension'), ('original_mimetype', 'target_mimetype')},
+            unique_together={('original_extension', 'target_extension'),
+                             ('original_mimetype', 'target_mimetype')},
         ),
     ]

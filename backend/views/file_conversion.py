@@ -9,7 +9,7 @@ import pdb
 @csrf_exempt
 def upload_and_create_document(request):
     original_file = request.FILES.get("original_file", None)
-    
+
     if not original_file:
         return JsonResponse({"error": "original_file is required"})
 
@@ -41,7 +41,7 @@ def upload_and_create_document(request):
 def target_conversions(request):
     supported_conversions = SupportedConversion.get_available_conversions_for_all_sources()
 
-    return JsonResponse({ 'supported_conversions': supported_conversions })
+    return JsonResponse({'supported_conversions': supported_conversions})
 
 
 def index(request):

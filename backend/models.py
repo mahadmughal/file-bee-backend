@@ -1,20 +1,23 @@
 from django.db import models
 from django.core.files import File
-from backend.mimetype_converter import MimetypeConverter
+from backend.converters.mimetype_converter import MimetypeConverter
 import datetime
 import os
 import pdb
 
 # Create your models here.
 
+
 class DocumentConversion(models.Model):
-    original_file = models.FileField(upload_to='media/uploaded_files/', default='default.pdf')
+    original_file = models.FileField(
+        upload_to='media/uploaded_files/', default='default.pdf')
     original_filename = models.CharField(max_length=255)
     original_mimetype = models.CharField(max_length=100)
     original_size = models.IntegerField()
     converted_file = models.FileField(upload_to='media/converted_files/')
     converted_filename = models.CharField(max_length=255, null=True)
-    converted_mimetype = models.CharField(max_length=100, blank=True, null=True)
+    converted_mimetype = models.CharField(
+        max_length=100, blank=True, null=True)
     converted_size = models.IntegerField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     completed_at = models.DateTimeField(blank=True, null=True)
@@ -43,7 +46,8 @@ class DocumentConversion(models.Model):
         }
 
     def conversion(self):
-        mimetype_converter = MimetypeConverter(self.original_mimetype, self.converted_mimetype, self.original_file)
+        mimetype_converter = MimetypeConverter(
+            self.original_mimetype, self.converted_mimetype, self.original_file)
         converted_file_path = mimetype_converter.convert()
 
         self.converted_file = File(open(converted_file_path, 'rb'))
@@ -51,8 +55,6 @@ class DocumentConversion(models.Model):
         self.completed_at = datetime.datetime.now()
         self.status = 'completed'
         self.save()
-
-
 
 
 class SupportedConversion(models.Model):
@@ -97,11 +99,14 @@ class SupportedConversion(models.Model):
             target_mimetype = conversion.target_mimetype
 
             if original_mimetype not in conversion_dict:
-                conversion_dict[original_mimetype] = { 'targetable_mimetypes': [], 'extension': conversion.original_extension }
+                conversion_dict[original_mimetype] = {
+                    'targetable_mimetypes': [], 'extension': conversion.original_extension}
             if target_mimetype not in conversion_dict:
-                conversion_dict[target_mimetype] = { 'targetable_mimetypes': [], 'extension':  conversion.target_extension }
+                conversion_dict[target_mimetype] = {
+                    'targetable_mimetypes': [], 'extension':  conversion.target_extension}
 
-            conversion_dict[original_mimetype]['targetable_mimetypes'].append(target_mimetype)
+            conversion_dict[original_mimetype]['targetable_mimetypes'].append(
+                target_mimetype)
 
         return conversion_dict
 

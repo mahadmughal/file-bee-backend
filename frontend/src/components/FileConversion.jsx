@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "../App.css";
 
 function FileConversion(props) {
-  const fileType = props.fileType
+  const fileType = props.fileType;
 
   const [conversionData, setConversionData] = useState([]);
   const [supportedConversions, setSupportedConversions] = useState({});
@@ -18,7 +18,7 @@ function FileConversion(props) {
     // This code will run once when the component is mounted
 
     const fetchSupportedMimetypes = async () => {
-      const url = "http://localhost:8000/backend/target_conversions/";
+      const url = "http://localhost:8000/target_conversions/";
       const headers = { "Content-Type": "application/json" };
 
       try {
@@ -83,7 +83,7 @@ function FileConversion(props) {
   };
 
   const handleConversionRequest = async (conversion, conversionIndex) => {
-    const url = "http://localhost:8000/backend/";
+    const url = "http://localhost:8000/";
     const header = { "X-CSRFTOKEN": getCookie("csrftoken") };
     const formData = new FormData();
     formData.append("original_file", conversion.file);
