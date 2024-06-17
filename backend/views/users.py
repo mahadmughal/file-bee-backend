@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
+from django.contrib.auth.models import User
 
 
 class UserRegistration(generics.CreateAPIView):
@@ -24,6 +25,13 @@ class UserLogin(APIView):
     permission_classes = [permissions.AllowAny]
 
     def post(self, request):
+        username = request.data["username"]
+        password = request.data["password"]
+
+        # Validate required fields
+        if not all((username, password)):
+            return Response({'error': 'Missing required fields: username or password'}, status=400)
+
         user = authenticate(
             request,
             username=request.data["username"],
@@ -34,4 +42,23 @@ class UserLogin(APIView):
             token, created = Token.objects.get_or_create(user=user)
             return Response({"token": token.key})
         else:
-            return Response({"error": "Invalid credentials"}, status=401)
+            # Authentication failed - provide specific error messages
+            error_messages = {
+                'nonexistent_user': 'Username does not exist.',
+                'inactive_user': 'User account is inactive.',
+                'wrong_password': 'Incorrect password.',
+            }
+
+            # Identify the specific authentication error (if possible)
+            try:
+                user = User.objects.get(username=username)
+                if not user.is_active:
+                    error_code = 'inactive_user'
+                else:
+                    error_code = 'wrong_password'
+            except User.DoesNotExist:
+                error_code = 'nonexistent_user'
+            except Exception as e:  # Catch any unexpected exceptions
+                error_code = 'internal_error'
+
+            return Response({'error': error_messages[error_code]}, status=401)
