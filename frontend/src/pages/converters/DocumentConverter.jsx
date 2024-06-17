@@ -1,5 +1,5 @@
 import React from "react";
-import FileConversion from "../components/FileConversion";
+import FileConversion from "../../components/FileConversion";
 
 function DocumentConverter() {
   const fileType = "Document";

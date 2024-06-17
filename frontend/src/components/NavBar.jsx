@@ -35,19 +35,25 @@ const NavBar = () => {
                   <li className="nav-main-item">
                     <Link to="/image_converter" className="nav-main-link">
                       <i className="nav-main-link-icon fa fa-images"></i>
-                      <span className="nav-main-link-name">Image Converter</span>
+                      <span className="nav-main-link-name">
+                        Image Converter
+                      </span>
                     </Link>
                   </li>
                   <li className="nav-main-item">
                     <Link to="/document_converter" className="nav-main-link">
                       <i className="nav-main-link-icon fa fa-file"></i>
-                      <span className="nav-main-link-name">Document Converter</span>
+                      <span className="nav-main-link-name">
+                        Document Converter
+                      </span>
                     </Link>
                   </li>
                   <li className="nav-main-item">
                     <Link to="/audio_converter" className="nav-main-link">
                       <i className="nav-main-link-icon fa fa-file-audio"></i>
-                      <span className="nav-main-link-name">Audio Converter</span>
+                      <span className="nav-main-link-name">
+                        Audio Converter
+                      </span>
                     </Link>
                   </li>
                   <li className="nav-main-item">
