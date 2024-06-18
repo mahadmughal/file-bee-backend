@@ -1,6 +1,7 @@
 import React from "react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import bgImage from "../../assets/images/photo22@2x.jpg";
 
 function SignUp() {
   const [username, setUsername] = useState("");
@@ -70,7 +71,7 @@ function SignUp() {
         <main id="main-container">
           <div
             className="bg-image"
-            // style="background-image: url('assets/media/photos/photo12@2x.jpg');"
+            style={{ backgroundImage: `url(${bgImage})` }}
           >
             <div className="row no-gutters justify-content-center bg-black-75">
               <div className="hero-static col-md-6 d-flex align-items-center bg-white">
