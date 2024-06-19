@@ -9,6 +9,7 @@ import AudioConverter from "./pages/converters/AudioConverter";
 import FontConverter from "./pages/converters/FontConverter";
 import SignIn from "./pages/auth/SignIn";
 import SignUp from "./pages/auth/SignUp";
+import ResetPassword from "./pages/auth/ResetPassword";
 import "./App.css";
 
 function App() {
@@ -57,6 +58,8 @@ function App() {
         />
         <Route path="/sign_up" element={<SignUp />} />
         <Route path="/sign_in" element={<SignIn />} />
+        <Route path="/reset_password" element={<ResetPassword />} />
+        <Route path="/reset_password/:token" element={<ResetPassword />} />
       </Routes>
     </BrowserRouter>
   );
