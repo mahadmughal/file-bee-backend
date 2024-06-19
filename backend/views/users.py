@@ -7,6 +7,9 @@ from rest_framework.views import APIView
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.models import User
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from backend.models import PasswordReset
+from backend.emailers.password_reset_emailer import PasswordResetEmailer
 
 
 class UserRegistration(generics.CreateAPIView):
@@ -62,3 +65,52 @@ class UserLogin(APIView):
                 error_code = 'internal_error'
 
             return Response({'error': error_messages[error_code]}, status=401)
+
+
+class RequestPasswordReset(generics.GenericAPIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        email = request.data['email']
+
+        if not email:
+            return Response({'error': 'Email is required.'}, status=400)
+
+        user = User.objects.filter(email__iexact=email).first()
+
+        if user:
+            token_generator = PasswordResetTokenGenerator()
+            token = token_generator.make_token(user)
+            password_reset = PasswordReset(
+                email=email, token=token, user_id=user.pk)
+            password_reset.save()
+
+            # Sending reset link via email
+            PasswordResetEmailer(password_reset.token, user).send_email()
+
+            return Response({'success': 'We have sent you a link to reset your password'}, status=200)
+        else:
+            return Response({"error": "Email is invalid"}, status=400)
+
+
+class ResetPassword(APIView):
+    permission_classes = [permissions.AllowAny]  # Allow unauthenticated users
+
+    def post(self, request):
+        token = request.data['token']
+        new_password = request.data['password']
+        confirm_password = request.data['confirm_password']
+
+        if new_password != confirm_password:
+            return Response({'error': 'Passwords do not match.'}, status=400)
+
+        password_reset = PasswordReset.objects.get(token=token)
+
+        if not password_reset:
+            return Response({'error': 'Password reset token is invalid. Please try again!'}, status=400)
+
+        user = password_reset.user
+        user.set_password(new_password)
+        user.save()
+
+        return Response({'message': 'Password changed successfully.'}, status=200)

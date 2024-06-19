@@ -1,6 +1,8 @@
 from django.db import models
 from django.core.files import File
 from backend.converters.mimetype_converter import MimetypeConverter
+from django.contrib.auth import get_user_model
+
 import datetime
 import os
 import pdb
@@ -112,3 +114,10 @@ class SupportedConversion(models.Model):
 
     def __str__(self):
         return f"original_mimetype={self.original_mimetype}, target_mimetype={self.target_mimetype}, original_extension={self.original_extension}, target_extension={self.target_extension}, available={self.available}"
+
+
+class PasswordReset(models.Model):
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    email = models.EmailField()
+    token = models.CharField(max_length=100)
+    created_at = models.DateTimeField(auto_now_add=True)

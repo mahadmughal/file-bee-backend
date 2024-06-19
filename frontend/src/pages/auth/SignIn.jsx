@@ -146,13 +146,13 @@ function SignIn() {
                           In
                         </button>
                         <p className="mt-3 mb-0 d-lg-flex justify-content-lg-between">
-                          <a
+                          <Link
+                            to="/reset_password"
                             className="btn btn-sm btn-light d-block d-lg-inline-block mb-1"
-                            href="op_auth_reminder.html"
                           >
-                            <i className="fa fa-exclamation-triangle text-muted mr-1"></i>{" "}
+                            <i className="fa fa-exclamation-triangle text-muted mr-1"></i>
                             Forgot password
-                          </a>
+                          </Link>
                           <Link
                             to="/sign_up"
                             className="btn btn-sm btn-light d-block d-lg-inline-block mb-1"
@@ -173,7 +173,7 @@ function SignIn() {
                   Welcome to the future
                 </p>
                 <p className="font-size-lg font-w600 text-white-75 mb-0">
-                  Copyright &copy; <span className="js-year-copy">2018</span>
+                  Copyright &copy; <span className="js-year-copy">2024</span>
                 </p>
               </div>
             </div>
