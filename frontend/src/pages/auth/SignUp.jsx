@@ -17,6 +17,16 @@ function SignUp() {
     e.preventDefault();
 
     // Basic form validation (optional, consider using a library)
+    if (!username) {
+      setError("Username is required");
+      return;
+    }
+
+    if (!email) {
+      setError("Email is required");
+      return;
+    }
+
     if (password.length < 8) {
       setError("Password should be of minimum 8 characters");
       return;
@@ -48,6 +58,7 @@ function SignUp() {
       if (!response.ok) {
         const errorData = await response.json();
         setError(errorData.error || "Registration failed");
+        console.log("Registration failed:", response);
       } else {
         console.log("User registration successful:", response);
         navigate("/sign_in");
