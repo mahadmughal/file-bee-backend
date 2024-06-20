@@ -192,203 +192,276 @@ function FileConversion(props) {
   };
 
   return (
-    <div className="content">
-      <div className="content content-full">
-        <div className="d-flex flex-column justify-content-sm-between text-center">
-          <div className="flex-sm-fill font-size-h1 font-w700 text-center">
-            <span className="text-dark">{fileType ? fileType : "File"}</span>
-            <span className="text-primary"> Converter</span>
+    <>
+      <div className="content pb-5">
+        <div className="content content-full">
+          <div className="d-flex flex-column justify-content-sm-between text-center">
+            <div className="flex-sm-fill font-size-h1 font-w700 text-center">
+              <span className="text-dark">{fileType ? fileType : "File"}</span>
+              <span className="text-primary"> Converter</span>
+            </div>
+            <div>Convert your files to any format</div>
           </div>
-          <div>Convert your files to any format</div>
         </div>
-      </div>
 
-      {conversionData.length > 0 && (
-        <div className="block block-rounded block-bordered">
-          <div className="block-header block-header-default">
-            <h3 className="block-title">{fileType} Conversions</h3>
-            <div className="block-options">
-              <div className="block-options-item">
-                {/* <code>.table</code> */}
+        {conversionData.length > 0 && (
+          <div className="block block-rounded block-bordered">
+            <div className="block-header block-header-default">
+              <h3 className="block-title">{fileType} Conversions</h3>
+              <div className="block-options">
+                <div className="block-options-item">
+                  {/* <code>.table</code> */}
+                </div>
               </div>
             </div>
-          </div>
-          <div className="block-content">
-            <table className="table table-vcenter">
-              <thead>
-                <tr>
-                  <th className="text-center">#</th>
-                  <th>Name</th>
-                  <th>Supported Conversions</th>
-                  <th className="d-none d-sm-table-cell">Status</th>
-                  <th className="text-center">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {conversionData.map((fileObject, index) => (
-                  <tr key={index}>
-                    <td className="text-center" scope="row">
-                      {index + 1}
-                    </td>
-                    <td className="font-w600">
-                      <i className="fa fa-image mr-2"></i>
-                      {fileObject.file.name}
-                    </td>
-                    <td>
-                      <select
-                        className="form-control target-mimetypes"
-                        id={index}
-                        style={{ width: "70%" }}
-                        onChange={selectSupportedConversion}
-                      >
-                        <option value="" required>
-                          Convert to format ...
-                        </option>
-                        {supportedConversions[
-                          fileObject.file.type
-                        ]?.targetable_mimetypes?.map(
-                          (target_mimetype, index) => (
-                            <option key={index} value={target_mimetype}>
-                              {supportedConversions[target_mimetype]?.extension}
-                            </option>
-                          )
-                        )}
-                      </select>
-                    </td>
-                    <td className="d-none d-sm-table-cell">
-                      <span
-                        className={`badge badge-${
-                          conversionStatus[fileObject.status].badgeColor
-                        }`}
-                      >
-                        {fileObject.status}
-                      </span>
-                      {fileObject.status === "processing" && (
-                        <span
-                          className="spinner-border spinner-border-sm text-primary ml-2"
-                          role="status"
-                        >
-                          <span className="sr-only">Loading...</span>
-                        </span>
-                      )}
-                    </td>
-                    <td className="text-center">
-                      <div className="btn-group">
-                        <button
-                          type="reset"
-                          className="btn btn-sm btn-danger mr-1"
-                          onClick={() => handleCancelConversion(index)}
-                        >
-                          <i className="fa fa-fw fa-times"></i> Delete
-                        </button>
-                        {fileObject.fileDownloadUrl && (
-                          <a
-                            href={
-                              fileObject.fileDownloadUrl
-                                ? fileObject.fileDownloadUrl
-                                : "#"
-                            }
-                            className="btn btn-sm btn-success"
-                            download={
-                              fileObject.convertedFileName
-                                ? fileObject.convertedFileName
-                                : ""
-                            }
-                          >
-                            <i className="fa fa-fw fa-download"></i> Download
-                          </a>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <div className="row block-content block-content-full block-content-sm bg-body-light">
-            <div className="col text-left">
-              <label htmlFor="upload-files" className="btn btn-primary">
-                <i className="fa fa-plus mr-2"></i> Add more files
-              </label>
-              <input
-                type="file"
-                id="upload-files"
-                onChange={handleFileUpload}
-                multiple
-                required
-                hidden
-              />
-            </div>
-            <div className="col text-right">
-              <button
-                type="reset"
-                className="btn btn-danger mr-1"
-                onClick={() => setConversionData([])}
-              >
-                <i className="fa fa-repeat"></i> Delete All
-              </button>
-              <button
-                type="submit"
-                className="btn btn-primary"
-                onClick={handleConversion}
-              >
-                Convert All <i className="fa fa-arrow-right ml-1"></i>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {conversionData.length === 0 && (
-        <div className="d-flex justify-content-center">
-          <div id="upload-file-block" className="block block-rounded">
             <div className="block-content">
-              <div id="upload-file" className="text-center">
-                <label
-                  htmlFor="id_original_file"
-                  className="btn btn-hero-lg btn-hero-primary mb-3"
-                >
-                  <i className="fa fa-upload mr-1" aria-hidden="true"></i>
-                  Upload File
+              <table className="table table-vcenter">
+                <thead>
+                  <tr>
+                    <th className="text-center">#</th>
+                    <th>Name</th>
+                    <th>Supported Conversions</th>
+                    <th className="d-none d-sm-table-cell">Status</th>
+                    <th className="text-center">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {conversionData.map((fileObject, index) => (
+                    <tr key={index}>
+                      <td className="text-center" scope="row">
+                        {index + 1}
+                      </td>
+                      <td className="font-w600">
+                        <i className="fa fa-image mr-2"></i>
+                        {fileObject.file.name}
+                      </td>
+                      <td>
+                        <select
+                          className="form-control target-mimetypes"
+                          id={index}
+                          style={{ width: "70%" }}
+                          onChange={selectSupportedConversion}
+                        >
+                          <option value="" required>
+                            Convert to format ...
+                          </option>
+                          {supportedConversions[
+                            fileObject.file.type
+                          ]?.targetable_mimetypes?.map(
+                            (target_mimetype, index) => (
+                              <option key={index} value={target_mimetype}>
+                                {
+                                  supportedConversions[target_mimetype]
+                                    ?.extension
+                                }
+                              </option>
+                            )
+                          )}
+                        </select>
+                      </td>
+                      <td className="d-none d-sm-table-cell">
+                        <span
+                          className={`badge badge-${
+                            conversionStatus[fileObject.status].badgeColor
+                          }`}
+                        >
+                          {fileObject.status}
+                        </span>
+                        {fileObject.status === "processing" && (
+                          <span
+                            className="spinner-border spinner-border-sm text-primary ml-2"
+                            role="status"
+                          >
+                            <span className="sr-only">Loading...</span>
+                          </span>
+                        )}
+                      </td>
+                      <td className="text-center">
+                        <div className="btn-group">
+                          <button
+                            type="reset"
+                            className="btn btn-sm btn-danger mr-1"
+                            onClick={() => handleCancelConversion(index)}
+                          >
+                            <i className="fa fa-fw fa-times"></i> Delete
+                          </button>
+                          {fileObject.fileDownloadUrl && (
+                            <a
+                              href={
+                                fileObject.fileDownloadUrl
+                                  ? fileObject.fileDownloadUrl
+                                  : "#"
+                              }
+                              className="btn btn-sm btn-success"
+                              download={
+                                fileObject.convertedFileName
+                                  ? fileObject.convertedFileName
+                                  : ""
+                              }
+                            >
+                              <i className="fa fa-fw fa-download"></i> Download
+                            </a>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="row block-content block-content-full block-content-sm bg-body-light">
+              <div className="col text-left">
+                <label htmlFor="upload-files" className="btn btn-primary">
+                  <i className="fa fa-plus mr-2"></i> Add more files
                 </label>
                 <input
                   type="file"
-                  multiple
-                  name="original_file"
-                  required
-                  id="id_original_file"
+                  id="upload-files"
                   onChange={handleFileUpload}
+                  multiple
+                  required
                   hidden
                 />
-                <p>
-                  Upload your files here, 100MB maximum file size or
-                  <Link to="/sign_up"> Sign up</Link>
-                  <button
-                    type="button"
-                    className="btn btn-light"
-                    onClick={() => {
-                      setSwalProps({
-                        show: true,
-                        text: "All your data is always protected and under your control.",
-                        icon: "info",
-                      });
-                    }}
-                  >
-                    <i className="fa fa-info-circle text-primary"></i>
-                  </button>
-                  <SweetAlert2
-                    {...swalProps}
-                    didClose={() => {
-                      setSwalProps({});
-                    }}
-                  />
-                </p>
+              </div>
+              <div className="col text-right">
+                <button
+                  type="reset"
+                  className="btn btn-danger mr-1"
+                  onClick={() => setConversionData([])}
+                >
+                  <i className="fa fa-repeat"></i> Delete All
+                </button>
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  onClick={handleConversion}
+                >
+                  Convert All <i className="fa fa-arrow-right ml-1"></i>
+                </button>
               </div>
             </div>
           </div>
+        )}
+
+        {conversionData.length === 0 && (
+          <div className="d-flex justify-content-center">
+            <div id="upload-file-block" className="block block-rounded">
+              <div className="block-content">
+                <div id="upload-file" className="text-center">
+                  <label
+                    htmlFor="id_original_file"
+                    className="btn btn-hero-lg btn-hero-primary mb-3"
+                  >
+                    <i className="fa fa-upload mr-1" aria-hidden="true"></i>
+                    Upload File
+                  </label>
+                  <input
+                    type="file"
+                    multiple
+                    name="original_file"
+                    required
+                    id="id_original_file"
+                    onChange={handleFileUpload}
+                    hidden
+                  />
+                  <p>
+                    Upload your files here, 100MB maximum file size or
+                    <Link to="/sign_up"> Sign up</Link>
+                    <button
+                      type="button"
+                      className="btn btn-light"
+                      onClick={() => {
+                        setSwalProps({
+                          show: true,
+                          text: "All your data is always protected and under your control.",
+                          icon: "info",
+                        });
+                      }}
+                    >
+                      <i className="fa fa-info-circle text-primary"></i>
+                    </button>
+                    <SweetAlert2
+                      {...swalProps}
+                      didClose={() => {
+                        setSwalProps({});
+                      }}
+                    />
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+      <div id="dm-features" className="bg-white px-8">
+        <div className="content content-full">
+          <div className="row py-3">
+            <div className="col-sm-6 col-md-4 mb-5">
+              <div className="my-3">
+                <i className="fa fa-2x fa-desktop text-primary"></i>
+              </div>
+              <h4 className="h5 mb-2">Completely online</h4>
+              <p className="mb-0 text-muted">
+                FileBee is a browser-based tool which means that you don't need
+                to download anything to your device because it works online.
+              </p>
+            </div>
+            <div className="col-sm-6 col-md-4 mb-5">
+              <div className="my-3">
+                <i className="fab fa-2x fa-sass text-primary"></i>
+              </div>
+              <h4 className="h5 mb-2">How it works</h4>
+              <p className="mb-0 text-muted">
+                Upload a file from your device. Click "Convert", wait a moment
+                while the tool is processing the file and save the result.
+              </p>
+            </div>
+            <div className="col-sm-6 col-md-4 mb-5">
+              <div className="my-3">
+                <i className="fa fa-2x fa-file-export text-primary"></i>
+              </div>
+              <h4 className="h5 mb-2">Unlimited file conversions</h4>
+              <p className="mb-0 text-muted">
+                FileBee supports all sorts of commonly-used mimetypes like PDF,
+                JPEG, PNG, MP3 and lot others.
+              </p>
+            </div>
+            <div className="col-sm-6 col-md-4 mb-5">
+              <div className="my-3">
+                <i className="far fa-2x fa-life-ring text-primary"></i>
+              </div>
+              <h4 className="h5 mb-2">All platforms supported</h4>
+              <p className="mb-0 text-muted">
+                All development and production related dependencies can be
+                installed through npm and used in any way you like.
+              </p>
+            </div>
+            <div className="col-sm-6 col-md-4 mb-5">
+              <div className="my-3">
+                <i className="fa fa-2x fa-boxes text-primary"></i>
+              </div>
+              <h4 className="h5 mb-2">Privacy guaranteed</h4>
+              <p className="mb-0 text-muted">
+                Don't worry, we delete input files right after editing and
+                output files after few hours that is why no one can access them.
+                Read more about security.
+              </p>
+            </div>
+            <div className="col-sm-6 col-md-4 mb-5">
+              <div className="my-3">
+                <i className="fab fa-2x fa-gulp text-primary"></i>
+              </div>
+              <h4 className="h5 mb-2">Easy to use</h4>
+              <p className="mb-0 text-muted">
+                The interface is very simple and intuitive, it doesn't require
+                any extra actions! It was designed to make it easy for anyone to
+                convert files.
+              </p>
+            </div>
+          </div>
         </div>
-      )}
-    </div>
+      </div>
+    </>
   );
 }
 
