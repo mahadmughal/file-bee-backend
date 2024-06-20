@@ -1,13 +1,7 @@
 from PIL import Image
 from reportlab.pdfgen import canvas
-from pdf2docx import Converter
-import fitz  # PyMuPDF
-from docx import Document
-from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
-import subprocess
 import os
-import pdb
 
 
 class ImageConverter:
