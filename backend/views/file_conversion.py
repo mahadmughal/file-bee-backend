@@ -1,9 +1,8 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse, FileResponse
+from django.shortcuts import render
+from django.http import FileResponse
 from backend.models import DocumentConversion, SupportedConversion
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-import pdb
 
 
 @csrf_exempt

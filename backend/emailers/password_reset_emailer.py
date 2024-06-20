@@ -27,4 +27,4 @@ class PasswordResetEmailer:
         """
         Generates the reset password URL using the reset token.
         """
-        return f"http://localhost:3000/reset_password/{self.reset_token}"  # Assuming http protocol
+        return f"{settings.DOMAIN_BASE_URL}/reset_password/{self.reset_token}"  # Assuming http protocol
