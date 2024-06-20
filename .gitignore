@@ -29,3 +29,4 @@
 /backend/migrations/__pycache__/
 /file_bee/__pycache__/
 __pycache__/
+.env
