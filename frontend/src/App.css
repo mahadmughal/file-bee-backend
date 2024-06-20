@@ -27330,3 +27330,14 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
 #horizontal-navigation-hover-centered {
   padding-block-start: 9px;
 }
+
+#upload-file-block {
+  width: 650px;
+  border-width: 2px;
+  border-radius: 2px;
+  border-color: #e1e1e1;
+  border-style: dashed;
+  background-color: #fafafa;
+  color: #bdbdbd;
+  transition: border 0.3s ease-in-out;
+}
