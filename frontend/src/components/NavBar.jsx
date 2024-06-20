@@ -5,11 +5,14 @@ const NavBar = () => {
   return (
     <div className="page_container">
       <header className="page-header">
-        <div className="bg-white p-3 rounded push">
-          <div
-            id="horizontal-navigation-hover-centered"
-            className="d-none d-lg-block mt-2 mt-lg-0"
-          >
+        <div className="bg-white p-3 rounded push row text-center justify-content-around">
+          <div className="col-3">
+            <Link to="/" className="link-fx font-w700 font-size-h1">
+              <span className="text-dark">File</span>
+              <span className="text-primary">Bee</span>
+            </Link>
+          </div>
+          <div id="horizontal-navigation-hover-centered" className="col-6">
             <ul className="nav-main nav-main-horizontal nav-main-hover nav-main-horizontal-center">
               <li className="nav-main-item">
                 <a
@@ -77,6 +80,18 @@ const NavBar = () => {
                 </a>
               </li>
             </ul>
+          </div>
+          <div className="col-3 mt-2">
+            <Link
+              to="/sign_in"
+              className="btn btn-outline-primary mr-1"
+              type="button"
+            >
+              Log in
+            </Link>
+            <Link to="/sign_up" className="btn btn-primary" type="button">
+              Sign up
+            </Link>
           </div>
         </div>
       </header>

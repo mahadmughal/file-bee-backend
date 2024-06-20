@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from "react";
 import "../App.css";
+import { Link } from "react-router-dom";
+import SweetAlert2 from "react-sweetalert2";
 
 function FileConversion(props) {
   const fileType = props.fileType;
 
+  const [swalProps, setSwalProps] = useState({});
   const [conversionData, setConversionData] = useState([]);
   const [supportedConversions, setSupportedConversions] = useState({});
 
@@ -192,8 +195,9 @@ function FileConversion(props) {
     <div className="content">
       <div className="content content-full">
         <div className="d-flex flex-column justify-content-sm-between text-center">
-          <div className="flex-sm-fill font-size-h2 font-w400 text-center text-info">
-            {fileType} Converter
+          <div className="flex-sm-fill font-size-h1 font-w700 text-center">
+            <span className="text-dark">{fileType ? fileType : "File"}</span>
+            <span className="text-primary"> Converter</span>
           </div>
           <div>Convert your files to any format</div>
         </div>
@@ -336,26 +340,50 @@ function FileConversion(props) {
       )}
 
       {conversionData.length === 0 && (
-        <div className="block block-rounded block-bordered">
-          <div className="block-content">
-            <div id="upload-file" className="text-center">
-              <label
-                htmlFor="id_original_file"
-                className="btn btn-hero-primary mb-3"
-              >
-                <i className="fa fa-upload mr-1" aria-hidden="true"></i> Upload
-                File
-              </label>
-              <input
-                type="file"
-                multiple
-                name="original_file"
-                required
-                id="id_original_file"
-                onChange={handleFileUpload}
-                hidden
-              />
-              <p>Upload your files here, 100MB maximum file size</p>
+        <div className="d-flex justify-content-center">
+          <div id="upload-file-block" className="block block-rounded">
+            <div className="block-content">
+              <div id="upload-file" className="text-center">
+                <label
+                  htmlFor="id_original_file"
+                  className="btn btn-hero-lg btn-hero-primary mb-3"
+                >
+                  <i className="fa fa-upload mr-1" aria-hidden="true"></i>
+                  Upload File
+                </label>
+                <input
+                  type="file"
+                  multiple
+                  name="original_file"
+                  required
+                  id="id_original_file"
+                  onChange={handleFileUpload}
+                  hidden
+                />
+                <p>
+                  Upload your files here, 100MB maximum file size or
+                  <Link to="/sign_up"> Sign up</Link>
+                  <button
+                    type="button"
+                    className="btn btn-light"
+                    onClick={() => {
+                      setSwalProps({
+                        show: true,
+                        text: "All your data is always protected and under your control.",
+                        icon: "info",
+                      });
+                    }}
+                  >
+                    <i className="fa fa-info-circle text-primary"></i>
+                  </button>
+                  <SweetAlert2
+                    {...swalProps}
+                    didClose={() => {
+                      setSwalProps({});
+                    }}
+                  />
+                </p>
+              </div>
             </div>
           </div>
         </div>
