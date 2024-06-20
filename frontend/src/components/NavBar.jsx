@@ -19,7 +19,7 @@ const NavBar = () => {
                   className="nav-main-link active"
                   href="be_ui_navigation_horizontal.html"
                 >
-                  <i className="nav-main-link-icon fa fa-rocket"></i>
+                  <i className="nav-main-link-icon fa fa-compass"></i>
                   <span className="nav-main-link-name">Overview</span>
                 </a>
               </li>
@@ -31,7 +31,7 @@ const NavBar = () => {
                   aria-expanded="false"
                   href="#"
                 >
-                  <i className="nav-main-link-icon fa fa-boxes"></i>
+                  <i className="nav-main-link-icon fa fa-redo fa-spin text-primary"></i>
                   <span className="nav-main-link-name">Converters</span>
                 </a>
                 <ul className="nav-main-submenu text-left">
@@ -69,14 +69,14 @@ const NavBar = () => {
               </li>
               <li className="nav-main-item">
                 <a className="nav-main-link" href="#">
-                  <i className="nav-main-link-icon fa fa-money-bill"></i>
-                  <span className="nav-main-link-name">Pricing</span>
+                  <i className="nav-main-link-icon fa fa-fw fa-magic"></i>
+                  <span className="nav-main-link-name">API</span>
                 </a>
               </li>
               <li className="nav-main-item">
                 <a className="nav-main-link" href="javascript:void(0)">
-                  <i className="nav-main-link-icon far fa-user-circle"></i>
-                  <span className="nav-main-link-name">Profile</span>
+                  <i className="nav-main-link-icon fa fa-hands-helping"></i>
+                  <span className="nav-main-link-name">Help</span>
                 </a>
               </li>
             </ul>
