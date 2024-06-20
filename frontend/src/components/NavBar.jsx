@@ -34,7 +34,7 @@ const NavBar = () => {
                   <i className="nav-main-link-icon fa fa-boxes"></i>
                   <span className="nav-main-link-name">Converters</span>
                 </a>
-                <ul className="nav-main-submenu">
+                <ul className="nav-main-submenu text-left">
                   <li className="nav-main-item">
                     <Link to="/image_converter" className="nav-main-link">
                       <i className="nav-main-link-icon fa fa-images"></i>
