@@ -5,6 +5,7 @@ attrs==23.2.0
 backcall==0.2.0
 beautifulsoup4==4.12.3
 bleach==6.1.0
+Brotli==1.1.0
 certifi==2024.6.2
 chardet==5.2.0
 charset-normalizer==3.3.2
@@ -77,4 +78,5 @@ urllib3==2.2.1
 wcwidth==0.2.13
 webencodings==0.5.1
 wheel==0.43.0
+woff2otf==1.0.1
 yarg==0.1.9

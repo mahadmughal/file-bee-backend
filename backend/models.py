@@ -52,7 +52,7 @@ class DocumentConversion(models.Model):
             self.original_mimetype, self.converted_mimetype, self.original_file)
         converted_file_path = mimetype_converter.convert()
 
-        self.converted_file = File(open(converted_file_path, 'rb'))
+        self.converted_file = converted_file_path
         self.converted_filename = self.converted_file.name.split('/')[-1]
         self.completed_at = datetime.datetime.now()
         self.status = 'completed'
