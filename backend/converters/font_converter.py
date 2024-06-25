@@ -1,5 +1,6 @@
 from fontTools.ttLib import TTFont
 import os
+from backend.converters.woff2ttf import WoffToTtfConverter
 
 
 class FontConverter:
@@ -11,16 +12,55 @@ class FontConverter:
     def convert(self):
         if self.is_otf_to_woff():
             self.convert_otf_to_woff()
+        elif self.is_otf_to_woff2():
+            self.convert_otf_to_woff2()
+        elif self.is_ttf_to_woff():
+            self.convert_ttf_to_woff()
+        elif self.is_ttf_to_woff2():
+            self.convert_ttf_to_woff2()
+        elif self.is_woff_to_ttf():
+            self.convert_woff_to_ttf()
 
-        return self.output_path
+        return self.output_path()
 
     def convert_otf_to_woff(self):
         f = TTFont(self.file.path)
         f.flavor = 'woff'
         f.save(self.output_path())
 
+    def convert_otf_to_woff2(self):
+        f = TTFont(self.file.path)
+        f.flavor = 'woff2'
+        f.save(self.output_path())
+
+    def convert_ttf_to_woff(self):
+        f = TTFont(self.file.path)
+        f.flavor = 'woff'
+        f.save(self.output_path())
+
+    def convert_ttf_to_woff2(self):
+        f = TTFont(self.file.path)
+        f.flavor = 'woff2'
+        f.save(self.output_path())
+
+    def convert_woff_to_ttf(self):
+        converter = WoffToTtfConverter(self.file.path)
+        converter.convert()
+
     def is_otf_to_woff(self):
         return self.source_mimetype == 'font/otf' and self.target_mimetype == 'font/woff'
+
+    def is_otf_to_woff2(self):
+        return self.source_mimetype == 'font/otf' and self.target_mimetype == 'font/woff2'
+
+    def is_ttf_to_woff(self):
+        return self.source_mimetype == 'font/ttf' and self.target_mimetype == 'font/woff'
+
+    def is_ttf_to_woff2(self):
+        return self.source_mimetype == 'font/ttf' and self.target_mimetype == 'font/woff2'
+
+    def is_woff_to_ttf(self):
+        return self.source_mimetype == 'font/woff' and self.target_mimetype == 'font/ttf'
 
     def output_path(self):
         self.output_path = self.generate_output_file_path()

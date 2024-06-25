@@ -2,10 +2,7 @@ from django.db import models
 from django.core.files import File
 from backend.converters.mimetype_converter import MimetypeConverter
 from django.contrib.auth import get_user_model
-
 import datetime
-import os
-import pdb
 
 # Create your models here.
 
@@ -111,6 +108,22 @@ class SupportedConversion(models.Model):
                 target_mimetype)
 
         return conversion_dict
+
+    @classmethod
+    def get_original_mimetype(cls, file_mimetype, file_extension):
+      # 1. Check for exact match
+        exact_matches = cls.objects.filter(
+            original_mimetype__iexact=file_mimetype, available=True)
+        if exact_matches.exists():
+            return exact_matches.first().original_mimetype
+
+        # 2. Check for substring match
+        for mimetype in cls.objects.filter(available=True).values_list('original_mimetype', flat=True):
+            if file_extension.lower() in mimetype.lower():
+                return mimetype
+
+        # 3. No match found
+        return None
 
     def __str__(self):
         return f"original_mimetype={self.original_mimetype}, target_mimetype={self.target_mimetype}, original_extension={self.original_extension}, target_extension={self.target_extension}, available={self.available}"
