@@ -33,6 +33,14 @@ class AudioConverter:
             self.convert_flac_to_wav()
         elif self.is_flac_to_mp2():
             self.convert_flac_to_mp2()
+        elif self.is_mp2_to_oga():
+            self.convert_mp2_to_oga()
+        elif self.is_mp2_to_mp3():
+            self.convert_mp2_to_mp3()
+        elif self.is_mp2_to_wav():
+            self.convert_mp2_to_wav()
+        elif self.is_mp2_to_flac():
+            self.convert_mp2_to_flac()
 
         return self.output_path
 
@@ -83,6 +91,22 @@ class AudioConverter:
     def convert_flac_to_mp2(self):
         audio = AudioSegment.from_file(self.file.path, format='flac')
         audio.export(self.output_path(), format='mp2')
+
+    def convert_mp2_to_oga(self):
+        audio = AudioSegment.from_file(self.file.path, format='mp3')
+        audio.export(self.output_path(), format='oga')
+
+    def convert_mp2_to_mp3(self):
+        audio = AudioSegment.from_file(self.file.path, format='mp3')
+        audio.export(self.output_path(), format='mp3')
+
+    def convert_mp2_to_wav(self):
+        audio = AudioSegment.from_file(self.file.path, format='mp3')
+        audio.export(self.output_path(), format='wav')
+
+    def convert_mp2_to_flac(self):
+        audio = AudioSegment.from_file(self.file.path, format='mp3')
+        audio.export(self.output_path(), format='flac')
 
     def output_path(self):
         self.output_path = self.generate_output_file_path()
@@ -135,3 +159,15 @@ class AudioConverter:
 
     def is_flac_to_mp2(self):
         return self.source_mimetype == 'audio/flac' and self.target_mimetype == 'audio/mp2'
+
+    def is_mp2_to_oga(self):
+        return self.source_mimetype == 'audio/mp2' and self.target_mimetype == 'audio/ogg'
+
+    def is_mp2_to_mp3(self):
+        return self.source_mimetype == 'audio/mp2' and self.target_mimetype == 'audio/mpeg'
+
+    def is_mp2_to_wav(self):
+        return self.source_mimetype == 'audio/mp2' and self.target_mimetype == 'audio/wav'
+
+    def is_mp2_to_flac(self):
+        return self.source_mimetype == 'audio/mp2' and self.target_mimetype == 'audio/flac'
