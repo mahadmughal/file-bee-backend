@@ -21,7 +21,7 @@ class FontConverter:
         elif self.is_woff_to_ttf():
             self.convert_woff_to_ttf()
 
-        return self.output_path()
+        return self.output_path
 
     def convert_otf_to_woff(self):
         f = TTFont(self.file.path)
@@ -46,6 +46,7 @@ class FontConverter:
     def convert_woff_to_ttf(self):
         converter = WoffToTtfConverter(self.file.path)
         converter.convert()
+        self.output_path = converter.outfile_path
 
     def is_otf_to_woff(self):
         return self.source_mimetype == 'font/otf' and self.target_mimetype == 'font/woff'
