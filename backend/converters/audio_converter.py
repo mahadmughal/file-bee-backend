@@ -15,6 +15,12 @@ class AudioConverter:
             self.convert_mp3_to_wav()
         elif self.is_mp3_to_flac():
             self.convert_mp3_to_flac()
+        elif self.is_wav_to_oga():
+            self.convert_wav_to_oga()
+        elif self.is_wav_to_mp3():
+            self.convert_wav_to_mp3()
+        elif self.is_wav_to_flac():
+            self.convert_wav_to_flac()
 
         return self.output_path
 
@@ -28,6 +34,18 @@ class AudioConverter:
 
     def convert_mp3_to_flac(self):
         audio = AudioSegment.from_file(self.file.path, format='mp3')
+        audio.export(self.output_path(), format='flac')
+
+    def convert_wav_to_oga(self):
+        audio = AudioSegment.from_file(self.file.path, format='wav')
+        audio.export(self.output_path(), format='oga')
+
+    def convert_wav_to_mp3(self):
+        audio = AudioSegment.from_file(self.file.path, format='wav')
+        audio.export(self.output_path(), format='mp3')
+
+    def convert_wav_to_flac(self):
+        audio = AudioSegment.from_file(self.file.path, format='wav')
         audio.export(self.output_path(), format='flac')
 
     def output_path(self):
@@ -54,3 +72,12 @@ class AudioConverter:
 
     def is_mp3_to_flac(self):
         return self.source_mimetype == 'audio/mpeg' and self.target_mimetype == 'audio/flac'
+
+    def is_wav_to_oga(self):
+        return self.source_mimetype == 'audio/wav' and self.target_mimetype == 'audio/ogg'
+
+    def is_wav_to_mp3(self):
+        return self.source_mimetype == 'audio/wav' and self.target_mimetype == 'audio/mpeg'
+
+    def is_wav_to_flac(self):
+        return self.source_mimetype == 'audio/wav' and self.target_mimetype == 'audio/flac'
