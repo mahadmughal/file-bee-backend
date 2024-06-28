@@ -16,10 +16,13 @@ def upload_and_create_document(request):
     if not converted_mimetype:
         return JsonResponse({"error": "converted_mimetype is required"})
 
+    original_mimetype = SupportedConversion.get_original_mimetype(
+        original_file.content_type, original_file.name.split('.')[-1])
+
     document_conversion = DocumentConversion.objects.create(
         original_file=original_file,
         original_filename=original_file.name,
-        original_mimetype=original_file.content_type,
+        original_mimetype=original_mimetype,
         original_size=original_file.size,
         converted_mimetype=converted_mimetype,
         status="processing",
@@ -31,7 +34,8 @@ def upload_and_create_document(request):
     if converted_file:
         response = FileResponse(open(converted_file.path, 'rb'))
         response['Content-Type'] = document_conversion.converted_mimetype
-        response['Content-Disposition'] = f'attachment; filename="{document_conversion.converted_filename}"'
+        response['Content-Disposition'] = f'attachment; filename="{
+            document_conversion.converted_filename}"'
         return response
     else:
         return JsonResponse({'error': 'unable to convert file'})

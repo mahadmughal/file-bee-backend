@@ -1,5 +1,6 @@
 from backend.converters.image_converter import ImageConverter
 from backend.converters.document_converter import DocumentConverter
+from backend.converters.font_converter import FontConverter
 import os
 
 
@@ -14,6 +15,10 @@ class MimetypeConverter:
             image_converter = ImageConverter(
                 self.source_mimetype, self.target_mimetype, self.file)
             return image_converter.convert()
+        elif self.source_mimetype.startswith("font"):
+            font_converter = FontConverter(
+                self.source_mimetype, self.target_mimetype, self.file)
+            return font_converter.convert()
         else:
             document_converter = DocumentConverter(
                 self.source_mimetype, self.target_mimetype, self.file)
