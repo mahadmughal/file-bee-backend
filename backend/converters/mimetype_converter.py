@@ -1,6 +1,7 @@
 from backend.converters.image_converter import ImageConverter
 from backend.converters.document_converter import DocumentConverter
 from backend.converters.font_converter import FontConverter
+from backend.converters.audio_converter import AudioConverter
 import os
 
 
@@ -19,6 +20,10 @@ class MimetypeConverter:
             font_converter = FontConverter(
                 self.source_mimetype, self.target_mimetype, self.file)
             return font_converter.convert()
+        elif self.source_mimetype.startswith("audio"):
+            audio_converter = AudioConverter(
+                self.source_mimetype, self.target_mimetype, self.file)
+            return audio_converter.convert()
         else:
             document_converter = DocumentConverter(
                 self.source_mimetype, self.target_mimetype, self.file)
