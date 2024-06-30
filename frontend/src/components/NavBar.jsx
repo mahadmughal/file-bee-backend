@@ -1,7 +1,18 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 
 const NavBar = () => {
+  const location = useLocation();
+  const [activeLink, setActiveLink] = useState(location.pathname);
+
+  const handleNavLinkClick = (path) => {
+    setActiveLink(path);
+  };
+
+  const isActive = (path) => {
+    return activeLink === path ? "active" : "";
+  };
+
   return (
     <div className="page_container">
       <header className="page-header">
@@ -15,17 +26,20 @@ const NavBar = () => {
           <div id="horizontal-navigation-hover-centered" className="col-6">
             <ul className="nav-main nav-main-horizontal nav-main-hover nav-main-horizontal-center">
               <li className="nav-main-item">
-                <a
-                  className="nav-main-link active"
-                  href="be_ui_navigation_horizontal.html"
+                <Link
+                  to="/"
+                  className={`nav-main-link ${isActive("/")}`}
+                  onClick={() => handleNavLinkClick("/")}
                 >
                   <i className="nav-main-link-icon fa fa-compass"></i>
                   <span className="nav-main-link-name">Overview</span>
-                </a>
+                </Link>
               </li>
               <li className="nav-main-item">
                 <a
-                  className="nav-main-link nav-main-link-submenu"
+                  className={`nav-main-link ${
+                    activeLink.includes("_converter") ? "active" : ""
+                  } nav-main-link-submenu`}
                   data-toggle="submenu"
                   aria-haspopup="true"
                   aria-expanded="false"
@@ -36,7 +50,13 @@ const NavBar = () => {
                 </a>
                 <ul className="nav-main-submenu text-left">
                   <li className="nav-main-item">
-                    <Link to="/image_converter" className="nav-main-link">
+                    <Link
+                      to="/image_converter"
+                      className={`nav-main-link ${isActive(
+                        "/image_converter"
+                      )}`}
+                      onClick={() => handleNavLinkClick("/image_converter")}
+                    >
                       <i className="nav-main-link-icon fa fa-images"></i>
                       <span className="nav-main-link-name">
                         Image Converter
@@ -44,7 +64,13 @@ const NavBar = () => {
                     </Link>
                   </li>
                   <li className="nav-main-item">
-                    <Link to="/document_converter" className="nav-main-link">
+                    <Link
+                      to="/document_converter"
+                      className={`nav-main-link ${isActive(
+                        "/document_converter"
+                      )}`}
+                      onClick={() => handleNavLinkClick("/document_converter")}
+                    >
                       <i className="nav-main-link-icon fa fa-file"></i>
                       <span className="nav-main-link-name">
                         Document Converter
@@ -52,7 +78,13 @@ const NavBar = () => {
                     </Link>
                   </li>
                   <li className="nav-main-item">
-                    <Link to="/audio_converter" className="nav-main-link">
+                    <Link
+                      to="/audio_converter"
+                      className={`nav-main-link ${isActive(
+                        "/audio_converter"
+                      )}`}
+                      onClick={() => handleNavLinkClick("/audio_converter")}
+                    >
                       <i className="nav-main-link-icon fa fa-file-audio"></i>
                       <span className="nav-main-link-name">
                         Audio Converter
@@ -60,7 +92,11 @@ const NavBar = () => {
                     </Link>
                   </li>
                   <li className="nav-main-item">
-                    <Link to="/font_converter" className="nav-main-link">
+                    <Link
+                      to="/font_converter"
+                      className={`nav-main-link ${isActive("/font_converter")}`}
+                      onClick={() => handleNavLinkClick("/font_converter")}
+                    >
                       <i className="nav-main-link-icon fa fa-font"></i>
                       <span className="nav-main-link-name">Font Converter</span>
                     </Link>

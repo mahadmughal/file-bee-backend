@@ -2,7 +2,7 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./pages/Layout";
-import DocumentConversion from "./components/FileConversion";
+import FileConversion from "./components/FileConversion";
 import ImageConverter from "./pages/converters/ImageConverter";
 import DocumentConverter from "./pages/converters/DocumentConverter";
 import AudioConverter from "./pages/converters/AudioConverter";
@@ -20,7 +20,7 @@ function App() {
           path="/"
           element={
             <Layout>
-              <DocumentConversion />
+              <FileConversion />
             </Layout>
           }
         />
