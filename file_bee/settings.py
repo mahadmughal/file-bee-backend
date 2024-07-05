@@ -151,6 +151,9 @@ REST_FRAMEWORK = {
     ),
 }
 
+# This tells Django to use your custom token model
+AUTH_TOKEN_MODEL = 'backend.CustomToken'
+
 DOMAIN_BASE_URL = config('DOMAIN_BASE_URL')
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

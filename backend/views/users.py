@@ -1,5 +1,5 @@
 from django.contrib.auth import authenticate
-from backend.serializers import UserSerializer
+from backend.serializers import UserSerializer, CustomTokenSerializer
 from rest_framework import generics, permissions
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
@@ -8,8 +8,11 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from backend.models import PasswordReset
+from backend.models.user import PasswordReset, CustomToken
 from backend.emailers.password_reset_emailer import PasswordResetEmailer
+from django.utils import timezone
+from datetime import timedelta
+import pdb
 
 
 class UserRegistration(generics.CreateAPIView):
@@ -42,8 +45,32 @@ class UserLogin(APIView):
         )
 
         if user:
-            token, created = Token.objects.get_or_create(user=user)
-            return Response({"token": token.key})
+            try:
+                token = CustomToken.objects.get(user=user)
+
+                if token.is_expired():
+                    token.delete()
+                    expiration_time = timezone.now() + timedelta(hours=2)
+                    token = CustomToken.objects.create(
+                        user=user, expires_at=expiration_time)
+                    message = "New token created"
+                else:
+                    message = "Existing token returned"
+
+            except CustomToken.DoesNotExist:
+                expiration_time = timezone.now() + timedelta(hours=2)
+                token = CustomToken.objects.create(
+                    user=user, expires_at=expiration_time)
+                message = "New token created"
+
+            # Use the serializer to convert the token object to JSON
+            serializer = CustomTokenSerializer(token)
+
+            return Response({
+                "token": serializer.data,
+                "message": message
+            }, status=200)
+
         else:
             # Authentication failed - provide specific error messages
             error_messages = {

@@ -1,12 +1,14 @@
 import React from "react";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import bgImage from "../../assets/images/photo22@2x.jpg";
+import { AuthContext } from "../../contexts/AuthContext";
 
 function SignIn() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null); // State for error handling
+  const { setCurrentUser, setToken } = useContext(AuthContext);
 
   const navigate = useNavigate();
 
@@ -40,7 +42,22 @@ function SignIn() {
         const errorData = await response.json();
         setError(errorData.error || "Login failed");
       } else {
+        const data = await response.json();
         console.log("User login successful:", response);
+
+        if (data.token && data.token.key) {
+          setToken(data.token.key);
+          setCurrentUser(data.token.user);
+
+          localStorage.setItem(
+            "authToken",
+            JSON.stringify({
+              key: data.token.key,
+              expiresAt: data.token.expires_at,
+            })
+          );
+        }
+
         navigate("/");
       }
     } catch (error) {
