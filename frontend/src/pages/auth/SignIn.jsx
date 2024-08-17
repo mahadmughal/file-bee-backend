@@ -1,16 +1,14 @@
 import React from "react";
-import { useState, useContext } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import bgImage from "../../assets/images/photo22@2x.jpg";
-import { AuthContext } from "../../contexts/AuthContext";
+import { useAuth } from "../../contexts/AuthContext";
 
 function SignIn() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null); // State for error handling
-  const { setCurrentUser, setToken } = useContext(AuthContext);
-
-  const navigate = useNavigate();
+  const auth = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -25,61 +23,12 @@ function SignIn() {
       return;
     }
 
-    const url = "http://localhost:8000/api/user/login/";
-    const header = { "X-CSRFTOKEN": getCookie("csrftoken") };
-    const formData = new FormData();
-    formData.append("username", username);
-    formData.append("password", password);
+    const data = {
+      username: username,
+      password: password,
+    };
 
-    try {
-      const response = await fetch(url, {
-        method: "POST",
-        header,
-        body: formData,
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        setError(errorData.error || "Login failed");
-      } else {
-        const data = await response.json();
-        console.log("User login successful:", response);
-
-        if (data.token && data.token.key) {
-          setToken(data.token.key);
-          setCurrentUser(data.token.user);
-
-          localStorage.setItem(
-            "authToken",
-            JSON.stringify({
-              key: data.token.key,
-              expiresAt: data.token.expires_at,
-            })
-          );
-        }
-
-        navigate("/");
-      }
-    } catch (error) {
-      setError(error);
-      console.error("Fetch error: ", error);
-    }
-  };
-
-  const getCookie = (name) => {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== "") {
-      const cookies = document.cookie.split(";");
-      for (let i = 0; i < cookies.length; i++) {
-        const cookie = cookies[i].trim();
-        // Does this cookie string begin with the name we want?
-        if (cookie.substring(0, name.length + 1) === name + "=") {
-          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-          break;
-        }
-      }
-    }
-    return cookieValue;
+    auth.loginAction(data);
   };
 
   const handleErrorClose = (e) => {
