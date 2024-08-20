@@ -28,7 +28,9 @@ function FileConversion(props) {
       fetchedRef.current = true;
 
       const url = "http://localhost:8000/target_conversions/";
-      const headers = { Authorization: `Token ${token.key}` };
+      const headers = {
+        Authorization: `Token ${token.key || token}`,
+      };
 
       try {
         const response = await fetch(url, { method: "GET", headers });
@@ -93,7 +95,7 @@ function FileConversion(props) {
 
   const handleConversionRequest = async (conversion, conversionIndex) => {
     const url = "http://localhost:8000/";
-    const headers = { Authorization: `Token ${token.key}` };
+    const headers = { Authorization: `Token ${token.key || token}` };
     const formData = new FormData();
     formData.append("original_file", conversion.file);
     formData.append("converted_mimetype", conversion.targetMimetype);
