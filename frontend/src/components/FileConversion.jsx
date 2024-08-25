@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "../App.css";
 import { Link } from "react-router-dom";
 import SweetAlert2 from "react-sweetalert2";
 import Features from "./Features";
+import { useAuth } from "../contexts/AuthContext";
 
 function FileConversion(props) {
   const fileType = props.fileType;
@@ -10,6 +11,9 @@ function FileConversion(props) {
   const [swalProps, setSwalProps] = useState({});
   const [conversionData, setConversionData] = useState([]);
   const [supportedConversions, setSupportedConversions] = useState({});
+
+  const { token } = useAuth();
+  const fetchedRef = useRef(false);
 
   const conversionStatus = {
     ready: { badgeColor: "info", badgeText: "ready" },
@@ -19,11 +23,14 @@ function FileConversion(props) {
   };
 
   useEffect(() => {
-    // This code will run once when the component is mounted
-
     const fetchSupportedMimetypes = async () => {
+      if (fetchedRef.current || !token) return;
+      fetchedRef.current = true;
+
       const url = "http://localhost:8000/target_conversions/";
-      const headers = { "Content-Type": "application/json" };
+      const headers = {
+        Authorization: `Token ${token.key || token}`,
+      };
 
       try {
         const response = await fetch(url, { method: "GET", headers });
@@ -88,7 +95,7 @@ function FileConversion(props) {
 
   const handleConversionRequest = async (conversion, conversionIndex) => {
     const url = "http://localhost:8000/";
-    const header = { "X-CSRFTOKEN": getCookie("csrftoken") };
+    const headers = { Authorization: `Token ${token.key || token}` };
     const formData = new FormData();
     formData.append("original_file", conversion.file);
     formData.append("converted_mimetype", conversion.targetMimetype);
@@ -96,7 +103,7 @@ function FileConversion(props) {
     try {
       const response = await fetch(url, {
         method: "POST",
-        header,
+        headers,
         body: formData,
       });
 

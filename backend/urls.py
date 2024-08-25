@@ -10,9 +10,11 @@ urlpatterns = [
          name='request_reset_password'),
     path('api/user/reset_password/',
          ResetPassword.as_view(), name='reset_password'),
-    path('', file_conversion.upload_and_create_document,
+    path('api/user/',
+         GetUserDetails.as_view(), name='user_details'),
+    path('', UploadAndCreateDocumentView.as_view(),
          name='upload_and_create_document'),
-    path('target_conversions/', file_conversion.target_conversions,
+    path('target_conversions/', TargetConversionsView.as_view(),
          name='target_conversions'),
-    path('documents/', file_conversion.index, name='index')
+    path('documents/', IndexView.as_view(), name='index')
 ]

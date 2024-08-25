@@ -18,6 +18,7 @@ import pdb
 class UserRegistration(generics.CreateAPIView):
     serializer_class = UserSerializer
     permission_classes = [permissions.AllowAny]
+    authentication_classes = []
 
     def perform_create(self, serializer):
         # Hash the password before saving the user
@@ -141,3 +142,34 @@ class ResetPassword(APIView):
         user.save()
 
         return Response({'message': 'Password changed successfully.'}, status=200)
+
+
+class GetUserDetails(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request):
+        # Get the token from the request headers
+        auth_header = request.headers.get('Authorization')
+        if not auth_header or not auth_header.startswith('Token '):
+            return Response({'error': 'Invalid or missing token'}, status=401)
+
+        token_key = auth_header.split(' ')[1]
+
+        try:
+            # Find the CustomToken
+            custom_token = CustomToken.objects.get(key=token_key)
+
+            # Check if the token is expired
+            if custom_token.is_expired():
+                return Response({'error': 'Token has expired'}, status=401)
+
+            # Get the user associated with the token
+            user = custom_token.user
+
+            # Serialize the user data
+            serializer = UserSerializer(user)
+
+            return Response(serializer.data, status=200)
+
+        except CustomToken.DoesNotExist:
+            return Response({'error': 'Invalid token'}, status=401)
