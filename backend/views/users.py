@@ -18,6 +18,7 @@ import pdb
 class UserRegistration(generics.CreateAPIView):
     serializer_class = UserSerializer
     permission_classes = [permissions.AllowAny]
+    authentication_classes = []
 
     def perform_create(self, serializer):
         # Hash the password before saving the user
