@@ -11,6 +11,7 @@ class UploadAndCreateDocumentView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
+        user = request.user
         original_file = request.FILES.get("original_file", None)
         if not original_file:
             return JsonResponse({"error": "original_file is required"}, status=400)
@@ -29,6 +30,7 @@ class UploadAndCreateDocumentView(APIView):
             original_size=original_file.size,
             converted_mimetype=converted_mimetype,
             status="processing",
+            user=user,
         )
         document_conversion.conversion()
         converted_file = document_conversion.converted_file

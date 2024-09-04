@@ -11,11 +11,14 @@ const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const storedToken = JSON.parse(localStorage.getItem("authToken"));
+    const user = JSON.parse(localStorage.getItem("user"));
 
     if (storedToken) {
       setToken(storedToken);
 
-      if (!user) {
+      if (user) {
+        setUser(user);
+      } else {
         getUserDetails(storedToken);
       }
     }
@@ -51,6 +54,7 @@ const AuthProvider = ({ children }) => {
 
           try {
             localStorage.setItem("authToken", JSON.stringify(tokenToStore));
+            localStorage.setItem("user", JSON.stringify(data.token.user));
             // After setting the token, navigate to root
             navigate("/");
           } catch (error) {
@@ -90,6 +94,11 @@ const AuthProvider = ({ children }) => {
     }
   };
 
+  const updateUser = (updatedUserData) => {
+    setUser(updatedUserData);
+    localStorage.setItem("user", JSON.stringify(updatedUserData));
+  };
+
   const logOut = () => {
     setUser(null);
     setToken(null);
@@ -102,7 +111,9 @@ const AuthProvider = ({ children }) => {
   }
 
   return (
-    <AuthContext.Provider value={{ token, user, loginAction, logOut }}>
+    <AuthContext.Provider
+      value={{ token, user, loginAction, logOut, updateUser }}
+    >
       {children}
     </AuthContext.Provider>
   );

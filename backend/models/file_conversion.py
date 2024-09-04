@@ -1,7 +1,7 @@
 from django.db import models
 from backend.converters.mimetype_converter import MimetypeConverter
 import datetime
-
+from django.conf import settings
 # Create your models here.
 
 
@@ -26,6 +26,10 @@ class DocumentConversion(models.Model):
         ('expired', 'expired'),
         ('failed', 'failed'),
     ))
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, related_name='document_conversions',
+        on_delete=models.CASCADE, verbose_name='User'
+    )
 
     def to_dict(self):
         return {

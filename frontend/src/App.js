@@ -11,6 +11,7 @@ import SignIn from "./pages/auth/SignIn";
 import SignUp from "./pages/auth/SignUp";
 import ResetPassword from "./pages/auth/ResetPassword";
 import AuthProvider from "./contexts/AuthContext";
+import Profile from "./pages/Profile";
 import "./App.css";
 
 function App() {
@@ -62,6 +63,14 @@ function App() {
           <Route path="/sign_in" element={<SignIn />} />
           <Route path="/reset_password" element={<ResetPassword />} />
           <Route path="/reset_password/:token" element={<ResetPassword />} />
+          <Route
+            path="/profile"
+            element={
+              <Layout>
+                <Profile />
+              </Layout>
+            }
+          />
         </Routes>
       </AuthProvider>
     </BrowserRouter>

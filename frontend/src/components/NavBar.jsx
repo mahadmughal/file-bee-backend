@@ -147,7 +147,7 @@ const NavBar = () => {
                   data-toggle="dropdown"
                   onClick={toggleDropdown}
                 >
-                  <i className="far fa-fw fa-user-circle"></i>
+                  <i className="far fa-user"></i>
                   <i className="fa fa-fw fa-angle-down ml-1 d-none d-sm-inline-block"></i>
                 </button>
                 {isOpen && (
@@ -159,12 +159,9 @@ const NavBar = () => {
                       {auth.user?.username || "User options"}
                     </div>
                     <div className="p-2">
-                      <a
-                        className="dropdown-item"
-                        href="be_pages_generic_profile.html"
-                      >
+                      <Link className="dropdown-item" to="/profile">
                         <i className="far fa-fw fa-user mr-1"></i> Profile
-                      </a>
+                      </Link>
                       <div role="separator" className="dropdown-divider"></div>
                       <a
                         className="dropdown-item"
