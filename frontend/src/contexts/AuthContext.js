@@ -14,14 +14,28 @@ const AuthProvider = ({ children }) => {
     const user = JSON.parse(localStorage.getItem("user"));
 
     if (storedToken) {
-      setToken(storedToken);
+      const expirationDate = new Date(storedToken.expiresAt);
+      const currentDate = new Date();
 
-      if (user) {
-        setUser(user);
+      if (currentDate > expirationDate) {
+        // Token has expired
+        console.log("Token has expired. Redirecting to sign-in page.");
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("user");
+        setToken(null);
+        setUser(null);
+        navigate("/sign_in");
       } else {
-        getUserDetails(storedToken);
+        // Token is still valid
+        setToken(storedToken);
+        if (user) {
+          setUser(user);
+        } else {
+          getUserDetails(storedToken);
+        }
       }
     }
+
     setLoading(false);
   }, []);
 
