@@ -5,6 +5,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.authentication import TokenAuthentication
+from backend.auth import CustomTokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
@@ -12,7 +13,9 @@ from backend.models.user import PasswordReset, CustomToken
 from backend.emailers.password_reset_emailer import PasswordResetEmailer
 from django.utils import timezone
 from datetime import timedelta
-import pdb
+from rest_framework import status
+from django.db import transaction
+from backend.models.file_conversion import DocumentConversion
 
 
 class UserRegistration(generics.CreateAPIView):
@@ -145,7 +148,8 @@ class ResetPassword(APIView):
 
 
 class GetUserDetails(APIView):
-    permission_classes = [permissions.AllowAny]
+    authentication_classes = [CustomTokenAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         # Get the token from the request headers
@@ -173,3 +177,90 @@ class GetUserDetails(APIView):
 
         except CustomToken.DoesNotExist:
             return Response({'error': 'Invalid token'}, status=401)
+
+
+class UpdateUserProfile(APIView):
+    authentication_classes = [CustomTokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request):
+        # Get the token from the request headers
+        auth_header = request.headers.get('Authorization')
+        if not auth_header or not auth_header.startswith('Token '):
+            return Response({'error': 'Invalid or missing token'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        token_key = auth_header.split(' ')[1]
+
+        try:
+            # Find the CustomToken
+            custom_token = CustomToken.objects.get(key=token_key)
+
+            # Check if the token is expired
+            if custom_token.is_expired():
+                return Response({'error': 'Token has expired'}, status=status.HTTP_401_UNAUTHORIZED)
+
+            # Get the user associated with the token
+            user = custom_token.user
+
+            # Get the data from the request
+            email = request.data.get('email')
+            first_name = request.data.get('first_name')
+            last_name = request.data.get('last_name')
+
+            # Update the user fields if provided
+            if email:
+                user.email = email
+            if first_name:
+                user.first_name = first_name
+            if last_name:
+                user.last_name = last_name
+
+            try:
+                user.full_clean()  # Validate the model
+                user.save()
+                serializer = UserSerializer(user)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            except Exception as e:
+                return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        except CustomToken.DoesNotExist:
+            return Response({'error': 'Invalid token'}, status=status.HTTP_401_UNAUTHORIZED)
+
+
+class DeleteUserAccount(APIView):
+    authentication_classes = [CustomTokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @transaction.atomic
+    def delete(self, request):
+        # Get the token from the request headers
+        auth_header = request.headers.get('Authorization')
+        if not auth_header or not auth_header.startswith('Token '):
+            return Response({'error': 'Invalid or missing token'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        token_key = auth_header.split(' ')[1]
+
+        try:
+            # Find the CustomToken
+            custom_token = CustomToken.objects.get(key=token_key)
+
+            # Check if the token is expired
+            if custom_token.is_expired():
+                return Response({'error': 'Token has expired'}, status=status.HTTP_401_UNAUTHORIZED)
+
+            # Get the user associated with the token
+            user = custom_token.user
+
+            # Delete associated records
+            DocumentConversion.objects.filter(user=user).delete()
+            CustomToken.objects.filter(user=user).delete()
+
+            # Delete the user
+            user.delete()
+
+            return Response({'message': 'User account and all associated data have been permanently deleted.'}, status=status.HTTP_200_OK)
+
+        except CustomToken.DoesNotExist:
+            return Response({'error': 'Invalid token'}, status=status.HTTP_401_UNAUTHORIZED)
+        except Exception as e:
+            return Response({'error': f'An error occurred: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

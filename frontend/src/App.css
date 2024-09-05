@@ -3005,11 +3005,8 @@ input[type="button"].btn-block {
   position: absolute;
   top: 100%;
   left: 0;
-  z-index: 1000;
-  display: none;
   float: left;
   min-width: 12rem;
-  padding: 0.5rem 0;
   margin: 0.125rem 0 0;
   font-size: 1rem;
   color: #495057;
@@ -11512,12 +11509,6 @@ small,
 .fade.fade-left.show {
   -webkit-transform: translateX(0);
           transform: translateX(0);
-}
-
-.dropdown-menu {
-  padding-right: .5rem;
-  padding-left: .5rem;
-  box-shadow: 0 0.25rem 2rem rgba(0, 0, 0, 0.08);
 }
 
 .dropdown-menu.dropdown-menu-lg {

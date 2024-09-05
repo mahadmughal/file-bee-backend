@@ -10,11 +10,32 @@ const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const storedToken = localStorage.getItem("authToken");
+    const storedToken = JSON.parse(localStorage.getItem("authToken"));
+    const user = JSON.parse(localStorage.getItem("user"));
+
     if (storedToken) {
-      setToken(storedToken);
-      // Optionally fetch user data here if needed
+      const expirationDate = new Date(storedToken.expiresAt);
+      const currentDate = new Date();
+
+      if (currentDate > expirationDate) {
+        // Token has expired
+        console.log("Token has expired. Redirecting to sign-in page.");
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("user");
+        setToken(null);
+        setUser(null);
+        navigate("/sign_in");
+      } else {
+        // Token is still valid
+        setToken(storedToken);
+        if (user) {
+          setUser(user);
+        } else {
+          getUserDetails(storedToken);
+        }
+      }
     }
+
     setLoading(false);
   }, []);
 
@@ -37,14 +58,23 @@ const AuthProvider = ({ children }) => {
         console.log("User login successful:", data);
 
         if (data.token && data.token.key) {
-          setUser(data.user);
-          setToken(data.token);
-          localStorage.setItem("authToken", data.token.key);
+          const tokenToStore = {
+            key: data.token.key,
+            expiresAt: data.token.expires_at,
+          };
 
-          // After setting the token, navigate to root
-          navigate("/");
+          setToken(tokenToStore);
+          setUser(data.token.user);
 
-          return;
+          try {
+            localStorage.setItem("authToken", JSON.stringify(tokenToStore));
+            localStorage.setItem("user", JSON.stringify(data.token.user));
+            // After setting the token, navigate to root
+            navigate("/");
+          } catch (error) {
+            console.error("Failed to store auth token:", error);
+            // Handle the error (e.g., show a notification to the user)
+          }
         }
       }
     } catch (err) {
@@ -52,9 +82,40 @@ const AuthProvider = ({ children }) => {
     }
   };
 
+  const getUserDetails = async (token) => {
+    try {
+      const response = await fetch("http://localhost:8000/api/user/", {
+        method: "GET",
+        headers: {
+          Authorization: `Token ${token.key}`,
+        },
+      });
+
+      if (response.status === 401) {
+        navigate("/sign_in");
+      } else if (!response.ok) {
+        const errorData = await response.json();
+        alert(errorData.error || "Login failed");
+      } else {
+        const data = await response.json();
+        console.log("User login successful:", data);
+        if (data.token && data.token.user) {
+          setUser(data.token.user);
+        }
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const updateUser = (updatedUserData) => {
+    setUser(updatedUserData);
+    localStorage.setItem("user", JSON.stringify(updatedUserData));
+  };
+
   const logOut = () => {
     setUser(null);
-    setToken("");
+    setToken(null);
     localStorage.removeItem("authToken");
     navigate("/sign_in");
   };
@@ -64,7 +125,9 @@ const AuthProvider = ({ children }) => {
   }
 
   return (
-    <AuthContext.Provider value={{ token, user, loginAction, logOut }}>
+    <AuthContext.Provider
+      value={{ token, user, loginAction, logOut, updateUser }}
+    >
       {children}
     </AuthContext.Provider>
   );

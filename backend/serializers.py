@@ -27,7 +27,10 @@ class CustomTokenSerializer(serializers.ModelSerializer):
         fields = ['key', 'user', 'created_at', 'expires_at']
 
     def get_user(self, obj):
+        user_obj = obj.user
         return {
-            'username': obj.user.username,
-            'email': obj.user.email
+            'username': user_obj.username,
+            'email': user_obj.email,
+            'first_name': user_obj.first_name,
+            'last_name': user_obj.last_name
         }
