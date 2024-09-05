@@ -154,53 +154,61 @@ const NavBar = () => {
               </>
             ) : (
               <>
-                <button
-                  type="button"
-                  className="btn btn-dual"
-                  id="profile-dropdown"
-                  data-toggle="dropdown"
-                  onClick={toggleDropdown}
-                  ref={dropdownRef}
-                >
-                  <i className="fa fa-user-circle fa-2x"></i>
-                  <i className="fa fa-fw fa-angle-down ml-1 d-none d-sm-inline-block"></i>
-                </button>
-                {isOpen && (
-                  <div
-                    className="dropdown-menu"
-                    aria-labelledby="profile-dropdown"
+                <div ref={dropdownRef}>
+                  <button
+                    type="button"
+                    className="btn btn-dual"
+                    id="profile-dropdown"
+                    data-toggle="dropdown"
+                    onClick={toggleDropdown}
                   >
-                    <div class="bg-primary-darker rounded-top font-w600 text-white text-center p-3">
-                      {auth.user?.username || "User options"}
+                    <i className="fa fa-user-circle fa-2x"></i>
+                    <i className="fa fa-fw fa-angle-down ml-1 d-none d-sm-inline-block"></i>
+                  </button>
+                  {isOpen && (
+                    <div
+                      className="dropdown-menu"
+                      aria-labelledby="profile-dropdown"
+                    >
+                      <div class="bg-primary-darker rounded-top font-w600 text-white text-center p-3">
+                        {auth.user?.username || "User options"}
+                      </div>
+                      <div className="p-2">
+                        <Link className="dropdown-item" to="/profile">
+                          <i className="far fa-fw fa-user mr-1"></i> Profile
+                        </Link>
+                        <div
+                          role="separator"
+                          className="dropdown-divider"
+                        ></div>
+                        <a
+                          className="dropdown-item"
+                          href="javascript:void(0)"
+                          data-toggle="layout"
+                          data-action="side_overlay_toggle"
+                        >
+                          <i className="far fa-fw fa-building mr-1"></i>{" "}
+                          Settings
+                        </a>
+                        <div
+                          role="separator"
+                          className="dropdown-divider"
+                        ></div>
+                        <Link
+                          to="/sign_in"
+                          className="dropdown-item"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            auth.logOut();
+                          }}
+                        >
+                          <i className="far fa-fw fa-arrow-alt-circle-left mr-1"></i>
+                          Sign Out
+                        </Link>
+                      </div>
                     </div>
-                    <div className="p-2">
-                      <Link className="dropdown-item" to="/profile">
-                        <i className="far fa-fw fa-user mr-1"></i> Profile
-                      </Link>
-                      <div role="separator" className="dropdown-divider"></div>
-                      <a
-                        className="dropdown-item"
-                        href="javascript:void(0)"
-                        data-toggle="layout"
-                        data-action="side_overlay_toggle"
-                      >
-                        <i className="far fa-fw fa-building mr-1"></i> Settings
-                      </a>
-                      <div role="separator" className="dropdown-divider"></div>
-                      <Link
-                        to="/sign_in"
-                        className="dropdown-item"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          auth.logOut();
-                        }}
-                      >
-                        <i className="far fa-fw fa-arrow-alt-circle-left mr-1"></i>
-                        Sign Out
-                      </Link>
-                    </div>
-                  </div>
-                )}
+                  )}
+                </div>
               </>
             )}
           </div>
