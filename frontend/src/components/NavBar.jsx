@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 
@@ -6,7 +6,21 @@ const NavBar = () => {
   const location = useLocation();
   const auth = useAuth();
   const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
   const [activeLink, setActiveLink] = useState(location.pathname);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const handleNavLinkClick = (path) => {
     setActiveLink(path);
@@ -143,17 +157,18 @@ const NavBar = () => {
                 <button
                   type="button"
                   className="btn btn-dual"
-                  id="page-header-user-dropdown"
+                  id="profile-dropdown"
                   data-toggle="dropdown"
                   onClick={toggleDropdown}
+                  ref={dropdownRef}
                 >
-                  <i className="far fa-user"></i>
+                  <i className="fa fa-user-circle fa-2x"></i>
                   <i className="fa fa-fw fa-angle-down ml-1 d-none d-sm-inline-block"></i>
                 </button>
                 {isOpen && (
                   <div
                     className="dropdown-menu"
-                    aria-labelledby="page-header-user-dropdown"
+                    aria-labelledby="profile-dropdown"
                   >
                     <div class="bg-primary-darker rounded-top font-w600 text-white text-center p-3">
                       {auth.user?.username || "User options"}
