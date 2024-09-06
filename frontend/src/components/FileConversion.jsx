@@ -391,8 +391,7 @@ function FileConversion(props) {
                     hidden
                   />
                   <p>
-                    Upload your files here, 100MB maximum file size or
-                    <Link to="/sign_up"> Sign up</Link>
+                    Upload your files here, 100MB maximum file size.
                     <button
                       type="button"
                       className="btn btn-light"
