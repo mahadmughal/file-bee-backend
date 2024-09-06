@@ -2,8 +2,11 @@ import React from "react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Alert from "./Alert";
+import { useApiService } from "../services/apiService";
 
 function ChangePassword({ passwordResetToken }) {
+  const apiService = useApiService();
+
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [alert, setAlert] = useState({});
@@ -23,52 +26,23 @@ function ChangePassword({ passwordResetToken }) {
       return;
     }
 
-    const url = "http://localhost:8000/api/user/reset_password/";
-    const header = { "X-CSRFTOKEN": getCookie("csrftoken") };
-    const formData = new FormData();
-    formData.append("token", passwordResetToken);
-    formData.append("password", newPassword);
-    formData.append("confirm_password", confirmPassword);
-
     try {
-      const response = await fetch(url, {
-        method: "POST",
-        header,
-        body: formData,
-      });
+      const response = await apiService.resetPassword(
+        passwordResetToken,
+        newPassword,
+        confirmPassword
+      );
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        setAlert({
-          message: errorData?.error || "Password reset failed",
-          type: "danger",
-        });
-      } else {
-        console.log("Password changed successfully:", response);
-        setAlert({ message: "Password Changed successfully", type: "success" });
-
-        navigate("/sign_in");
-      }
+      console.log("Password changed successfully:", response);
+      setAlert({ message: "Password Changed successfully", type: "success" });
+      navigate("/sign_in");
     } catch (error) {
-      setAlert({ message: error.toString(), type: "danger" });
-      console.error("Fetch error: ", error);
+      setAlert({
+        message: error.message || "Password reset failed",
+        type: "danger",
+      });
+      console.error("Reset password error: ", error);
     }
-  };
-
-  const getCookie = (name) => {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== "") {
-      const cookies = document.cookie.split(";");
-      for (let i = 0; i < cookies.length; i++) {
-        const cookie = cookies[i].trim();
-        // Does this cookie string begin with the name we want?
-        if (cookie.substring(0, name.length + 1) === name + "=") {
-          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-          break;
-        }
-      }
-    }
-    return cookieValue;
   };
 
   return (

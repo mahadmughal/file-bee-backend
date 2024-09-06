@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
 import "../App.css";
-import { Link } from "react-router-dom";
 import SweetAlert2 from "react-sweetalert2";
 import Features from "./Features";
 import { useAuth } from "../contexts/AuthContext";
+import { useApiService } from "../services/apiService";
 
 function FileConversion(props) {
+  const apiService = useApiService();
+
   const fileType = props.fileType;
 
   const [swalProps, setSwalProps] = useState({});
@@ -27,21 +29,8 @@ function FileConversion(props) {
       if (fetchedRef.current || !token) return;
       fetchedRef.current = true;
 
-      const url = "http://localhost:8000/target_conversions/";
-      const headers = {
-        Authorization: `Token ${token.key || token}`,
-      };
-
       try {
-        const response = await fetch(url, { method: "GET", headers });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        console.log(data);
-
+        const data = await apiService.fetchSupportedMimetypes();
         setSupportedConversions(data.supported_conversions);
       } catch (error) {
         console.error("Fetch error:", error);
@@ -94,34 +83,29 @@ function FileConversion(props) {
   };
 
   const handleConversionRequest = async (conversion, conversionIndex) => {
-    const url = "http://localhost:8000/";
-    const headers = { Authorization: `Token ${token.key || token}` };
-    const formData = new FormData();
-    formData.append("original_file", conversion.file);
-    formData.append("converted_mimetype", conversion.targetMimetype);
-
     try {
-      const response = await fetch(url, {
-        method: "POST",
-        headers,
-        body: formData,
-      });
+      const response = await apiService.convertFile(
+        conversion.file,
+        conversion.targetMimetype
+      );
 
       if (!response.ok) {
-        return {};
+        throw new Error("Conversion failed");
       }
 
       const blob = await response.blob();
       const contentType = response.headers.get("content-type");
       const fileDownloadUrl = URL.createObjectURL(blob);
-      const convertedFileName = `converted_${conversionIndex}.${supportedConversions[contentType].extension}`;
+      const convertedFileName = `converted_${conversionIndex}.${
+        supportedConversions[contentType]?.extension || "unknown"
+      }`;
 
       return {
-        fileDownloadUrl: fileDownloadUrl,
-        convertedFileName: convertedFileName,
+        fileDownloadUrl,
+        convertedFileName,
       };
     } catch (error) {
-      console.error("Fetch error:", error);
+      console.error("Conversion error:", error);
       return {};
     }
   };
@@ -199,22 +183,6 @@ function FileConversion(props) {
     }
 
     return "";
-  };
-
-  const getCookie = (name) => {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== "") {
-      const cookies = document.cookie.split(";");
-      for (let i = 0; i < cookies.length; i++) {
-        const cookie = cookies[i].trim();
-        // Does this cookie string begin with the name we want?
-        if (cookie.substring(0, name.length + 1) === name + "=") {
-          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-          break;
-        }
-      }
-    }
-    return cookieValue;
   };
 
   return (
