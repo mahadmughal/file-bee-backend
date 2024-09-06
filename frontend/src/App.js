@@ -12,6 +12,7 @@ import SignUp from "./pages/auth/SignUp";
 import ResetPassword from "./pages/auth/ResetPassword";
 import AuthProvider from "./contexts/AuthContext";
 import Profile from "./pages/Profile";
+import Api from "./pages/Api";
 import "./App.css";
 
 function App() {
@@ -59,6 +60,7 @@ function App() {
               </Layout>
             }
           />
+          <Route path="/api" element={<Api />} />
           <Route path="/sign_up" element={<SignUp />} />
           <Route path="/sign_in" element={<SignIn />} />
           <Route path="/reset_password" element={<ResetPassword />} />
