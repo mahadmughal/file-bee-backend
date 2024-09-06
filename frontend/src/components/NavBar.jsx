@@ -181,19 +181,6 @@ const NavBar = () => {
                           role="separator"
                           className="dropdown-divider"
                         ></div>
-                        <a
-                          className="dropdown-item"
-                          href="javascript:void(0)"
-                          data-toggle="layout"
-                          data-action="side_overlay_toggle"
-                        >
-                          <i className="far fa-fw fa-building mr-1"></i>{" "}
-                          Settings
-                        </a>
-                        <div
-                          role="separator"
-                          className="dropdown-divider"
-                        ></div>
                         <Link
                           to="/sign_in"
                           className="dropdown-item"
