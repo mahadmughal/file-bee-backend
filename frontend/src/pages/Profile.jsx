@@ -1,9 +1,12 @@
 import React from "react";
-import { useAuth } from "../contexts/AuthContext";
 import { useState, useEffect } from "react";
+import { useAuth } from "../contexts/AuthContext";
+import { useApiService } from "../services/apiService";
 
 const Profile = () => {
-  const { user, token, updateUser, logOut } = useAuth();
+  const apiService = useApiService();
+
+  const { user, updateUser, logOut } = useAuth();
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
@@ -31,25 +34,12 @@ const Profile = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
-      const response = await fetch("http://localhost:8000/api/user/profile", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Token ${token.key}`,
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to update profile");
-      }
-
-      const updatedUser = await response.json();
-      setMessage("Profile updated successfully!");
-      // Update the user context if necessary
+      const updatedUser = await apiService.updateUserProfile(formData);
+      console.log(updateUser);
       updateUser({ ...user, ...updatedUser });
+      setMessage("Profile updated successfully!");
     } catch (error) {
       setMessage(`Error: ${error.message}`);
     }
@@ -62,26 +52,9 @@ const Profile = () => {
       )
     ) {
       try {
-        const response = await fetch(
-          "http://localhost:8000/api/user/delete_account",
-          {
-            method: "DELETE",
-            headers: {
-              Authorization: `Token ${token.key}`,
-            },
-          }
-        );
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || "Failed to delete account");
-        }
-
-        // Account deleted successfully
+        await apiService.deleteAccount();
         setMessage("Your account has been successfully deleted.");
-        // Log out the user and redirect to home page
         logOut();
-        // navigate("/sign_in");
       } catch (error) {
         setMessage(`Error: ${error.message}`);
       }

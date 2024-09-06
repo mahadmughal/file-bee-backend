@@ -7,6 +7,7 @@ from rest_framework.views import APIView
 from rest_framework.authentication import TokenAuthentication
 from backend.auth import CustomTokenAuthentication
 from rest_framework.permissions import IsAuthenticated
+from django.http import FileResponse, JsonResponse
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from backend.models.user import PasswordReset, CustomToken
@@ -16,6 +17,7 @@ from datetime import timedelta
 from rest_framework import status
 from django.db import transaction
 from backend.models.file_conversion import DocumentConversion
+import pdb
 
 
 class UserRegistration(generics.CreateAPIView):
@@ -40,7 +42,7 @@ class UserLogin(APIView):
 
         # Validate required fields
         if not all((username, password)):
-            return Response({'error': 'Missing required fields: username or password'}, status=400)
+            return JsonResponse({'error': 'Missing required fields: username or password'}, status=400)
 
         user = authenticate(
             request,
@@ -70,7 +72,7 @@ class UserLogin(APIView):
             # Use the serializer to convert the token object to JSON
             serializer = CustomTokenSerializer(token)
 
-            return Response({
+            return JsonResponse({
                 "token": serializer.data,
                 "message": message
             }, status=200)
@@ -95,7 +97,7 @@ class UserLogin(APIView):
             except Exception as e:  # Catch any unexpected exceptions
                 error_code = 'internal_error'
 
-            return Response({'error': error_messages[error_code]}, status=401)
+            return JsonResponse({'error': error_messages[error_code]}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 class RequestPasswordReset(generics.GenericAPIView):
@@ -105,7 +107,7 @@ class RequestPasswordReset(generics.GenericAPIView):
         email = request.data['email']
 
         if not email:
-            return Response({'error': 'Email is required.'}, status=400)
+            return JsonResponse({'error': 'Email is required.'}, status=status.HTTP_400_BAD_REQUEST)
 
         user = User.objects.filter(email__iexact=email).first()
 
@@ -119,9 +121,9 @@ class RequestPasswordReset(generics.GenericAPIView):
             # Sending reset link via email
             PasswordResetEmailer(password_reset.token, user).send_email()
 
-            return Response({'success': 'We have sent you a link to reset your password'}, status=200)
+            return JsonResponse({'success': 'We have sent you a link to reset your password'}, status=status.HTTP_200_OK)
         else:
-            return Response({"error": "Email is invalid"}, status=400)
+            return JsonResponse({"error": "Email is invalid"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ResetPassword(APIView):
@@ -133,18 +135,18 @@ class ResetPassword(APIView):
         confirm_password = request.data['confirm_password']
 
         if new_password != confirm_password:
-            return Response({'error': 'Passwords do not match.'}, status=400)
+            return JsonResponse({'error': 'Passwords do not match.'}, status=status.HTTP_400_BAD_REQUEST)
 
         password_reset = PasswordReset.objects.get(token=token)
 
         if not password_reset:
-            return Response({'error': 'Password reset token is invalid. Please try again!'}, status=400)
+            return JsonResponse({'error': 'Password reset token is invalid. Please try again!'}, status=status.HTTP_400_BAD_REQUEST)
 
         user = password_reset.user
         user.set_password(new_password)
         user.save()
 
-        return Response({'message': 'Password changed successfully.'}, status=200)
+        return JsonResponse({'message': 'Password changed successfully.'}, status=status.HTTP_200_OK)
 
 
 class GetUserDetails(APIView):
@@ -155,7 +157,7 @@ class GetUserDetails(APIView):
         # Get the token from the request headers
         auth_header = request.headers.get('Authorization')
         if not auth_header or not auth_header.startswith('Token '):
-            return Response({'error': 'Invalid or missing token'}, status=401)
+            return JsonResponse({'error': 'Invalid or missing token'}, status=status.HTTP_401_UNAUTHORIZED)
 
         token_key = auth_header.split(' ')[1]
 
@@ -165,7 +167,7 @@ class GetUserDetails(APIView):
 
             # Check if the token is expired
             if custom_token.is_expired():
-                return Response({'error': 'Token has expired'}, status=401)
+                return JsonResponse({'error': 'Token has expired'}, status=status.HTTP_401_UNAUTHORIZED)
 
             # Get the user associated with the token
             user = custom_token.user
@@ -173,21 +175,21 @@ class GetUserDetails(APIView):
             # Serialize the user data
             serializer = UserSerializer(user)
 
-            return Response(serializer.data, status=200)
+            return JsonResponse(serializer.data, status=200)
 
         except CustomToken.DoesNotExist:
-            return Response({'error': 'Invalid token'}, status=401)
+            return JsonResponse({'error': 'Invalid token'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 class UpdateUserProfile(APIView):
     authentication_classes = [CustomTokenAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def put(self, request):
+    def post(self, request):
         # Get the token from the request headers
         auth_header = request.headers.get('Authorization')
         if not auth_header or not auth_header.startswith('Token '):
-            return Response({'error': 'Invalid or missing token'}, status=status.HTTP_401_UNAUTHORIZED)
+            return JsonResponse({'error': 'Invalid or missing token'}, status=status.HTTP_401_UNAUTHORIZED)
 
         token_key = auth_header.split(' ')[1]
 
@@ -197,7 +199,7 @@ class UpdateUserProfile(APIView):
 
             # Check if the token is expired
             if custom_token.is_expired():
-                return Response({'error': 'Token has expired'}, status=status.HTTP_401_UNAUTHORIZED)
+                return JsonResponse({'error': 'Token has expired'}, status=status.HTTP_401_UNAUTHORIZED)
 
             # Get the user associated with the token
             user = custom_token.user
@@ -219,12 +221,12 @@ class UpdateUserProfile(APIView):
                 user.full_clean()  # Validate the model
                 user.save()
                 serializer = UserSerializer(user)
-                return Response(serializer.data, status=status.HTTP_200_OK)
+                return JsonResponse(serializer.data, status=status.HTTP_200_OK)
             except Exception as e:
-                return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+                return JsonResponse({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         except CustomToken.DoesNotExist:
-            return Response({'error': 'Invalid token'}, status=status.HTTP_401_UNAUTHORIZED)
+            return JsonResponse({'error': 'Invalid token'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 class DeleteUserAccount(APIView):
@@ -236,7 +238,7 @@ class DeleteUserAccount(APIView):
         # Get the token from the request headers
         auth_header = request.headers.get('Authorization')
         if not auth_header or not auth_header.startswith('Token '):
-            return Response({'error': 'Invalid or missing token'}, status=status.HTTP_401_UNAUTHORIZED)
+            return JsonResponse({'error': 'Invalid or missing token'}, status=status.HTTP_401_UNAUTHORIZED)
 
         token_key = auth_header.split(' ')[1]
 
@@ -246,7 +248,7 @@ class DeleteUserAccount(APIView):
 
             # Check if the token is expired
             if custom_token.is_expired():
-                return Response({'error': 'Token has expired'}, status=status.HTTP_401_UNAUTHORIZED)
+                return JsonResponse({'error': 'Token has expired'}, status=status.HTTP_401_UNAUTHORIZED)
 
             # Get the user associated with the token
             user = custom_token.user
@@ -258,9 +260,9 @@ class DeleteUserAccount(APIView):
             # Delete the user
             user.delete()
 
-            return Response({'message': 'User account and all associated data have been permanently deleted.'}, status=status.HTTP_200_OK)
+            return JsonResponse({'message': 'User account and all associated data have been permanently deleted.'}, status=status.HTTP_200_OK)
 
         except CustomToken.DoesNotExist:
-            return Response({'error': 'Invalid token'}, status=status.HTTP_401_UNAUTHORIZED)
+            return JsonResponse({'error': 'Invalid token'}, status=status.HTTP_401_UNAUTHORIZED)
         except Exception as e:
-            return Response({'error': f'An error occurred: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return JsonResponse({'error': f'An error occurred: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
