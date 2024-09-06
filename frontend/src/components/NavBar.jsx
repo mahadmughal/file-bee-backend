@@ -125,10 +125,10 @@ const NavBar = () => {
                 </ul>
               </li>
               <li className="nav-main-item">
-                <a className="nav-main-link" href="#">
+                <Link to="/api" className="nav-main-link">
                   <i className="nav-main-link-icon fa fa-fw fa-magic"></i>
                   <span className="nav-main-link-name">API</span>
-                </a>
+                </Link>
               </li>
               <li className="nav-main-item">
                 <a className="nav-main-link" href="javascript:void(0)">
