@@ -11,7 +11,9 @@ import SignIn from "./pages/auth/SignIn";
 import SignUp from "./pages/auth/SignUp";
 import ResetPassword from "./pages/auth/ResetPassword";
 import AuthProvider from "./contexts/AuthContext";
+import HelpRequest from "./pages/HelpRequest";
 import Profile from "./pages/Profile";
+import Help from "./pages/Help";
 import Api from "./pages/Api";
 import "./App.css";
 
@@ -61,6 +63,12 @@ function App() {
             }
           />
           <Route path="/api" element={<Api />} />
+          {/* Nested routes for Help */}
+          <Route path="/help" element={<Layout />}>
+            <Route index element={<Help />} />
+            <Route path="submit_request" element={<HelpRequest />} />
+          </Route>
+
           <Route path="/sign_up" element={<SignUp />} />
           <Route path="/sign_in" element={<SignIn />} />
           <Route path="/reset_password" element={<ResetPassword />} />

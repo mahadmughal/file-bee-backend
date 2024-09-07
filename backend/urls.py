@@ -1,5 +1,7 @@
 from django.urls import path
 
+from backend.views.help_request import SubmitHelpRequestView
+
 from .views import *
 
 urlpatterns = [
@@ -20,5 +22,6 @@ urlpatterns = [
          name='upload_and_create_document'),
     path('target_conversions/', TargetConversionsView.as_view(),
          name='target_conversions'),
-    path('documents/', IndexView.as_view(), name='index')
+    path('send_help_request/', SubmitHelpRequestView.as_view(),
+         name='send_help_request'),
 ]
