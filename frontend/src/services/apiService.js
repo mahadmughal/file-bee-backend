@@ -120,6 +120,10 @@ class ApiService {
   async deleteAccount() {
     return this.deleteWithAuth("/api/user/delete_account");
   }
+
+  async submitHelpRequest(formData) {
+    return this.postWithoutAuth("/send_help_request/", formData);
+  }
 }
 
 export const apiService = new ApiService();

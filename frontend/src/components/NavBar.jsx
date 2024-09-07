@@ -131,10 +131,10 @@ const NavBar = () => {
                 </Link>
               </li>
               <li className="nav-main-item">
-                <a className="nav-main-link" href="javascript:void(0)">
+                <Link to="/help" className="nav-main-link">
                   <i className="nav-main-link-icon fa fa-hands-helping"></i>
                   <span className="nav-main-link-name">Help</span>
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
