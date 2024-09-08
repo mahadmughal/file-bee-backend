@@ -170,7 +170,7 @@ const NavBar = () => {
                       className="dropdown-menu"
                       aria-labelledby="profile-dropdown"
                     >
-                      <div class="bg-primary-darker rounded-top font-w600 text-white text-center p-3">
+                      <div className="bg-primary-darker rounded-top font-w600 text-white text-center p-3">
                         {auth.user?.username || "User options"}
                       </div>
                       <div className="p-2">

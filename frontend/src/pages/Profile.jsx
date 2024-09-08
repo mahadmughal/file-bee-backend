@@ -2,9 +2,11 @@ import React from "react";
 import { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { useApiService } from "../services/apiService";
+import { useAlert } from "../contexts/Alert";
 
 const Profile = () => {
   const apiService = useApiService();
+  const { addAlert } = useAlert();
 
   const { user, updateUser, logOut } = useAuth();
   const [formData, setFormData] = useState({
@@ -39,9 +41,17 @@ const Profile = () => {
       const updatedUser = await apiService.updateUserProfile(formData);
       console.log(updateUser);
       updateUser({ ...user, ...updatedUser });
-      setMessage("Profile updated successfully!");
+      addAlert({
+        type: "success",
+        title: "Success: ",
+        message: "Profile updated successfully.",
+      });
     } catch (error) {
-      setMessage(`Error: ${error.message}`);
+      addAlert({
+        type: "error",
+        title: "Error: ",
+        message: error.message,
+      });
     }
   };
 
@@ -53,21 +63,24 @@ const Profile = () => {
     ) {
       try {
         await apiService.deleteAccount();
-        setMessage("Your account has been successfully deleted.");
+        addAlert({
+          type: "success",
+          title: "Success: ",
+          message: "Your account has been successfully deleted.",
+        });
         logOut();
       } catch (error) {
-        setMessage(`Error: ${error.message}`);
+        addAlert({
+          type: "error",
+          title: "Error: ",
+          message: error.message,
+        });
       }
     }
   };
 
   return (
     <main id="main-container">
-      {message && (
-        <div className="alert alert-success" role="alert">
-          {message}
-        </div>
-      )}
       <div className="content w-50">
         <div className="block block-rounded block-bordered">
           <div className="block mb-0">

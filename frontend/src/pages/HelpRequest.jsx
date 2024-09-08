@@ -110,16 +110,16 @@ const HelpRequest = () => {
                 </div>
                 <div className="form-group">
                   <label htmlFor="attachment">Attachment</label>
-                  <div class="custom-file">
+                  <div className="custom-file">
                     <input
                       type="file"
-                      class="custom-file-input"
+                      className="custom-file-input"
                       data-toggle="custom-file-input"
                       id="attachment"
                       name="attachment"
                       onChange={handleInputChange}
                     />
-                    <label class="custom-file-label" for="attachment">
+                    <label className="custom-file-label" for="attachment">
                       {formData.attachment?.name || "Choose file"}
                     </label>
                   </div>
