@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'django_extensions',
     'rest_framework',
-    'rest_framework.authtoken'
+    'rest_framework.authtoken',
+    'storages'
 ]
 
 MIDDLEWARE = [
@@ -149,6 +150,14 @@ REST_FRAMEWORK = {
     ),
 }
 
+STORAGES = {
+    # Media file (image) management
+    "default": {"BACKEND": "storages.backends.s3boto3.S3Boto3Storage"},
+    # CSS and JS file management
+    "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},
+}
+
+
 # This tells Django to use your custom token model
 AUTH_TOKEN_MODEL = 'backend.CustomToken'
 
@@ -162,3 +171,11 @@ EMAIL_PORT = config('EMAIL_PORT')
 EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 # EMAIL_HOST_PASSWORD = 'denizenfromgmail'
+
+# AWS S3 Configuration
+AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')
+AWS_S3_REGION_NAME = config('AWS_S3_REGION_NAME')
+AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com"
+AWS_S3_FILE_OVERWRITE = True

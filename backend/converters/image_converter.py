@@ -1,7 +1,9 @@
 from PIL import Image
 from reportlab.pdfgen import canvas
-from reportlab.pdfgen import canvas
 import os
+from io import BytesIO
+from django.core.files.base import ContentFile
+from backend.utils.s3_utils import s3_client
 
 
 class ImageConverter:
@@ -11,65 +13,70 @@ class ImageConverter:
         self.target_mimetype = target_mimetype
 
     def convert(self):
-        image = Image.open(self.file.name)
-        output_file_path = self.generate_output_file_path()
+        image = self.get_image_from_s3()
+        output = BytesIO()
 
         if self.is_png_to_jpeg():
             image = image.convert('RGB')
-            image.save(output_file_path, 'JPEG', quality=95)
+            image.save(output, 'JPEG', quality=95)
         elif self.is_jpeg_to_bmp() or self.is_png_to_bmp():
             image = image.convert(mode="P", palette=Image.ADAPTIVE, colors=256)
             image = image.convert("RGB")
-            image.save(output_file_path)
+            image.save(output)
         elif self.is_jpeg_to_png():
-            image.save(output_file_path, 'PNG')
+            image.save(output, 'PNG')
         elif self.is_jpeg_to_webp() or self.is_png_to_webp():
-            image.save(output_file_path, 'WEBP')
+            image.save(output, 'WEBP')
         elif self.is_webp_to_png():
             image = image.convert("RGB")
-            image.save(output_file_path, 'PNG')
+            image.save(output, 'PNG')
         elif self.is_webp_to_jpeg():
             image = image.convert("RGB")
-            image.save(output_file_path, 'JPEG')
+            image.save(output, 'JPEG')
         elif self.is_webp_to_bmp():
             image = image.convert("RGB")
-            image.save(output_file_path, 'BMP')
+            image.save(output, 'BMP')
         elif self.is_gif_to_png():
-            image.save(output_file_path, 'PNG')
+            image.save(output, 'PNG')
         elif self.is_gif_to_jpeg():
             image = image.convert("RGB")
-            image.save(output_file_path, 'JPEG')
+            image.save(output, 'JPEG')
         elif self.is_gif_to_webp():
-            image.save(output_file_path, 'WEBP')
+            image.save(output, 'WEBP')
         elif self.is_gif_to_bmp():
-            image.save(output_file_path, 'BMP')
+            image.save(output, 'BMP')
         elif self.is_png_to_pdf():
-            self.convert_image_to_pdf(image, output_file_path)
+            output = self.convert_image_to_pdf(image)
         elif self.is_jpeg_to_pdf():
-            self.convert_image_to_pdf(image, output_file_path)
+            output = self.convert_image_to_pdf(image)
         elif self.is_webp_to_pdf():
-            self.convert_image_to_pdf(image, output_file_path)
+            output = self.convert_image_to_pdf(image)
 
-        return output_file_path
+        return ContentFile(output.getvalue())
 
-    def convert_image_to_pdf(self, input_image, output_file_path):
-        print('converting image to pdf file ...')
-        pdf_canvas = canvas.Canvas(output_file_path, pagesize=input_image.size)
+    def convert_image_to_pdf(self, input_image):
+        print('Converting image to PDF...')
+        buffer = BytesIO()
+        pdf_canvas = canvas.Canvas(buffer, pagesize=input_image.size)
         pdf_canvas.drawInlineImage(
-            self.file.name, 0, 0, width=input_image.width, height=input_image.height)
+            input_image, 0, 0, width=input_image.width, height=input_image.height)
         pdf_canvas.save()
 
-    def generate_output_file_path(self, target_extension=None):
-        # Get the directory part of the original file path
-        file_directory = os.path.dirname(self.file.name)
+        return buffer
 
-        # Get the filename part of the original file path
-        file_name = os.path.basename(self.file.path)
+    # TODO: not functional, have to confirm whether to remove this method.
+    def generate_output_file_path(self, target_extension=None):
+        file_directory = os.path.dirname(self.file.name)
+        file_name = os.path.basename(self.file.name)
         target_extension = target_extension if target_extension else self.target_mimetype.split(
             '/')[-1]
 
-        # Construct the output file path in the same directory with a different extension
         return (file_directory + '/' + file_name.split('.')[0] + '.' + target_extension).replace('uploaded', 'converted')
+
+    def get_image_from_s3(self):
+        file_content = s3_client.get_object(self.file.name)
+
+        return Image.open(BytesIO(file_content))
 
     def is_png_to_jpeg(self):
         return self.source_mimetype == 'image/png' and self.target_mimetype == 'image/jpeg'

@@ -1,29 +1,29 @@
 import struct
 import zlib
-import os
+import io
 
 
 class WoffToTtfConverter:
 
-    def __init__(self, infile_path):
+    def __init__(self, infile):
         """
-        Initializes the converter with input and output file paths.
+        Initializes the converter with an input file object.
 
         Args:
-            infile_path (str): Path to the input WOFF file.
-            outfile_path (str): Path to the output TTF/OTF file.
+            infile (file-like object): The input WOFF file object.
         """
-        self.infile_path = infile_path
-        self.outfile_path = self.generate_output_file_path()
+        self.infile = infile
 
     def convert(self):
         """
-        Converts the WOFF font file at `self.infile_path` to a TTF/OTF file at `self.outfile_path`.
-        """
+        Converts the WOFF font from the input file object to a TTF/OTF file in memory.
 
-        with open(self.infile_path, mode='rb') as infile:
-            with open(self.outfile_path, mode='wb') as outfile:
-                self._convert_streams(infile, outfile)
+        Returns:
+            bytes: The content of the converted TTF/OTF file.
+        """
+        outfile = io.BytesIO()
+        self._convert_streams(self.infile, outfile)
+        return outfile.getvalue()
 
     def _convert_streams(self, infile, outfile):
         WOFFHeader = {
@@ -91,12 +91,19 @@ class WoffToTtfConverter:
                 padding = 4 - (offset % 4)
             outfile.write(bytearray(padding))
 
-    def generate_output_file_path(self, target_extension=None):
-        # Get the directory part of the original file path
-        file_directory = os.path.dirname(self.infile_path)
+# Usage example
 
-        # Get the filename part of the original file path
-        file_name = os.path.basename(self.infile_path)
 
-        # Construct the output file path in the same directory with a different extension
-        return (file_directory + '/' + file_name.split('.')[0] + '.' + 'ttf').replace('uploaded', 'converted')
+def main():
+    with open('path/to/your/font.woff', 'rb') as infile:
+        converter = WoffToTtfConverter(infile)
+        ttf_content = converter.convert()
+
+    # Optionally, save the content to a file
+    with open('converted_font.ttf', 'wb') as f:
+        f.write(ttf_content)
+    print("Conversion completed.")
+
+
+if __name__ == "__main__":
+    main()

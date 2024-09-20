@@ -89,20 +89,11 @@ function FileConversion(props) {
         conversion.targetMimetype
       );
 
-      if (!response.ok) {
-        throw new Error("Conversion failed");
-      }
-
-      const blob = await response.blob();
-      const contentType = response.headers.get("content-type");
-      const fileDownloadUrl = URL.createObjectURL(blob);
-      const convertedFileName = `converted_${conversionIndex}.${
-        supportedConversions[contentType]?.extension || "unknown"
-      }`;
+      const { url, file_name } = response.converted_file;
 
       return {
-        fileDownloadUrl,
-        convertedFileName,
+        fileDownloadUrl: url,
+        convertedFileName: file_name,
       };
     } catch (error) {
       console.error("Conversion error:", error);
@@ -287,6 +278,7 @@ function FileConversion(props) {
                                   : "#"
                               }
                               className="btn btn-sm btn-success"
+                              target="_blank"
                               download={
                                 fileObject.convertedFileName
                                   ? fileObject.convertedFileName
