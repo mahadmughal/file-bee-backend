@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import FileResponse, JsonResponse
+from django.http import JsonResponse
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from backend.models.file_conversion import DocumentConversion, SupportedConversion
@@ -36,11 +36,13 @@ class UploadAndCreateDocumentView(APIView):
         converted_file = document_conversion.converted_file
 
         if converted_file:
-            response = FileResponse(open(converted_file.path, 'rb'))
-            response['Content-Type'] = document_conversion.converted_mimetype
-            response['Content-Disposition'] = f'attachment; filename="{
-                document_conversion.converted_filename}"'
-            return response
+            return JsonResponse({
+                'converted_file': {
+                    'url': converted_file.url,
+                    'file_name': document_conversion.converted_filename,
+                    'mime_type': document_conversion.converted_mimetype,
+                }
+            }, status=200)
         else:
             return JsonResponse({'error': 'unable to convert file'}, status=500)
 

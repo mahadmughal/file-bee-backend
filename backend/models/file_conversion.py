@@ -2,16 +2,17 @@ from django.db import models
 from backend.converters.mimetype_converter import MimetypeConverter
 import datetime
 from django.conf import settings
-# Create your models here.
+from storages.backends.s3boto3 import S3Boto3Storage
 
 
 class DocumentConversion(models.Model):
     original_file = models.FileField(
-        upload_to='media/uploaded_files/', default='default.pdf')
+        upload_to='media/uploaded_files/', storage=S3Boto3Storage(), default='default')
     original_filename = models.CharField(max_length=255)
     original_mimetype = models.CharField(max_length=100)
     original_size = models.IntegerField()
-    converted_file = models.FileField(upload_to='media/converted_files/')
+    converted_file = models.FileField(
+        upload_to='media/converted_files/', storage=S3Boto3Storage(), default='default')
     converted_filename = models.CharField(max_length=255, null=True)
     converted_mimetype = models.CharField(
         max_length=100, blank=True, null=True)
@@ -49,10 +50,19 @@ class DocumentConversion(models.Model):
     def conversion(self):
         mimetype_converter = MimetypeConverter(
             self.original_mimetype, self.converted_mimetype, self.original_file)
-        converted_file_path = mimetype_converter.convert()
+        converted_file = mimetype_converter.convert()
 
-        self.converted_file = converted_file_path
-        self.converted_filename = self.converted_file.name.split('/')[-1]
+        supported_conversion = SupportedConversion.objects.filter(
+            original_mimetype=self.original_mimetype,
+            target_mimetype=self.converted_mimetype,
+            available=True
+        ).first()
+
+        self.converted_filename = f"{self.original_filename.rsplit(
+            '.')[0]}.{supported_conversion.target_extension}"
+
+        self.converted_file.save(
+            self.converted_filename, converted_file, save=False)
         self.completed_at = datetime.datetime.now()
         self.status = 'completed'
         self.save()
