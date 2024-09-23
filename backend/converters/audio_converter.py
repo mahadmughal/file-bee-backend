@@ -154,7 +154,7 @@ class AudioConverter:
         return output_buffer.getvalue()
 
     def convert_mp2_to_mp3(self, input_audio):
-        audio = AudioSegment.from_file(input_audio, format='mp2')
+        audio = AudioSegment.from_file(input_audio, format='mp3')
         output_buffer = BytesIO()
         audio.export(output_buffer, format='mp3')
         output_buffer.seek(0)
@@ -162,7 +162,7 @@ class AudioConverter:
         return output_buffer.getvalue()
 
     def convert_mp2_to_wav(self, input_audio):
-        audio = AudioSegment.from_file(input_audio, format='mp2')
+        audio = AudioSegment.from_file(input_audio, format='mp3')
         output_buffer = BytesIO()
         audio.export(output_buffer, format='wav')
         output_buffer.seek(0)
@@ -170,7 +170,7 @@ class AudioConverter:
         return output_buffer.getvalue()
 
     def convert_mp2_to_flac(self, input_audio):
-        audio = AudioSegment.from_file(input_audio, format='mp2')
+        audio = AudioSegment.from_file(input_audio, format='mp3')
         output_buffer = BytesIO()
         audio.export(output_buffer, format='flac')
         output_buffer.seek(0)
