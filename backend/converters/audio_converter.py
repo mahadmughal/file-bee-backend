@@ -146,7 +146,7 @@ class AudioConverter:
         return output_buffer.getvalue()
 
     def convert_mp2_to_oga(self, input_audio):
-        audio = AudioSegment.from_file(input_audio, format='mp2')
+        audio = AudioSegment.from_file(input_audio, format='mp3')
         output_buffer = BytesIO()
         audio.export(output_buffer, format='oga')
         output_buffer.seek(0)
