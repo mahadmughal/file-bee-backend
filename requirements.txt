@@ -14,6 +14,7 @@ chardet==5.2.0
 charset-normalizer==3.3.2
 decorator==5.1.1
 defusedxml==0.7.1
+distlib==0.3.8
 Django==5.0.6
 django-cors-headers==4.3.1
 django-extensions==3.2.3
@@ -23,6 +24,7 @@ docopt==0.6.2
 executing==2.0.1
 fastjsonschema==2.19.1
 ffmpeg==1.4
+filelock==3.16.1
 fire==0.6.0
 fonttools==4.53.0
 gunicorn==23.0.0
@@ -87,6 +89,7 @@ tqdm==4.66.5
 traitlets==5.14.3
 typing_extensions==4.12.1
 urllib3==2.2.1
+virtualenv==20.26.5
 wcwidth==0.2.13
 webencodings==0.5.1
 wheel==0.43.0
