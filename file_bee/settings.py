@@ -83,19 +83,32 @@ WSGI_APPLICATION = 'file_bee.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'file_bee_development',      # Replace with your desired database name
-        # Replace with your PostgreSQL username
-        'USER': config('DATABASE_USERNAME'),
-        # 'PASSWORD': 'yourdbpassword',  # Replace with your PostgreSQL password
-        # Replace with your PostgreSQL host
-        'HOST': config('DATABASE_HOST'),
-        # Replace with your PostgreSQL port
         'PORT': config('DATABASE_PORT'),
     }
 }
+
+# Development settings
+if config('ENV') == 'development':
+    DATABASES['default'].update({
+        'NAME': config('DATABASE_NAME'),
+        'USER': config('DATABASE_USERNAME'),
+        # 'PASSWORD': config('DATABASE_PASSWORD'),
+        'HOST': config('DATABASE_HOST'),
+    })
+
+# Production settings
+elif config('ENV') == 'production':
+    DATABASES['default'].update({
+        'NAME': config('DATABASE_NAME'),
+        'USER': config('DATABASE_USERNAME'),
+        'PASSWORD': config('DATABASE_PASSWORD'),
+        'HOST': config('DATABASE_HOST'),
+        'OPTIONS': {'sslmode': 'require'},
+    })
 
 
 # Password validation
@@ -142,7 +155,7 @@ STATIC_URL = '/media/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ALLOWED_ORIGINS = [
-    "file-bee.com",
+    "http://file-bee.com",
     "http://localhost:3000",
 ]
 
