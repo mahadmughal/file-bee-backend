@@ -154,6 +154,10 @@ STATIC_URL = '/media/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+INTERNAL_IPS = [
+    '13.50.150.202'
+]
+
 CORS_ALLOWED_ORIGINS = [
     "https://ec2-13-50-150-202.eu-north-1.compute.amazonaws.com",
     "https://file-bee.com",
