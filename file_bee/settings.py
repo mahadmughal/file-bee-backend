@@ -156,7 +156,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ALLOWED_ORIGINS = [
     "https://ec2-13-50-150-202.eu-north-1.compute.amazonaws.com"
-    "http://file-bee.com",
     "https://file-bee.com",
     "http://localhost:3000",
 ]
