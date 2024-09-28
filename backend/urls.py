@@ -18,7 +18,7 @@ urlpatterns = [
          UpdateUserProfile.as_view(), name='user_profile'),
     path('user/delete_account',
          DeleteUserAccount.as_view(), name='delete_account'),
-    path('', UploadAndCreateDocumentView.as_view(),
+    path('convert/', UploadAndCreateDocumentView.as_view(),
          name='upload_and_create_document'),
     path('target_conversions/', TargetConversionsView.as_view(),
          name='target_conversions'),
