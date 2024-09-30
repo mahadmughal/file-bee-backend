@@ -22,7 +22,7 @@ class ImageConverter:
         elif self.is_jpeg_to_bmp() or self.is_png_to_bmp():
             image = image.convert(mode="P", palette=Image.ADAPTIVE, colors=256)
             image = image.convert("RGB")
-            image.save(output)
+            image.save(output, 'BMP')
         elif self.is_jpeg_to_png():
             image.save(output, 'PNG')
         elif self.is_jpeg_to_webp() or self.is_png_to_webp():
