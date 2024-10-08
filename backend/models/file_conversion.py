@@ -28,8 +28,11 @@ class DocumentConversion(models.Model):
         ('failed', 'failed'),
     ))
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, related_name='document_conversions',
-        on_delete=models.CASCADE, verbose_name='User'
+        settings.AUTH_USER_MODEL,
+        related_name='document_conversions',
+        on_delete=models.CASCADE,
+        verbose_name='User',
+        null=True
     )
 
     def to_dict(self):
