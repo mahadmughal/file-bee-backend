@@ -1,17 +1,28 @@
-from django.shortcuts import render
 from django.http import JsonResponse
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
 from backend.models.file_conversion import DocumentConversion, SupportedConversion
-from backend.auth import CustomTokenAuthentication
+from backend.models.user import CustomToken
+from django.contrib.auth.models import AnonymousUser
 
 
 class UploadAndCreateDocumentView(APIView):
-    authentication_classes = [CustomTokenAuthentication]
-    permission_classes = [IsAuthenticated]
-
     def post(self, request):
-        user = request.user
+        auth_token = request.POST.get("auth_token")
+
+        if auth_token == 'null':
+            user = None
+        else:
+            try:
+                token = CustomToken.objects.get(key=auth_token)
+                if token.is_expired():
+                    token.delete()
+                    user = None
+                else:
+                    user = token.user
+
+            except CustomToken.DoesNotExist:
+                user = None
+
         original_file = request.FILES.get("original_file", None)
         if not original_file:
             return JsonResponse({"error": "original_file is required"}, status=400)
@@ -22,6 +33,9 @@ class UploadAndCreateDocumentView(APIView):
 
         original_mimetype = SupportedConversion.get_original_mimetype(
             original_file.content_type, original_file.name.split('.')[-1])
+
+        user = request.user if not isinstance(
+            request.user, AnonymousUser) else None
 
         document_conversion = DocumentConversion.objects.create(
             original_file=original_file,
@@ -48,17 +62,6 @@ class UploadAndCreateDocumentView(APIView):
 
 
 class TargetConversionsView(APIView):
-    authentication_classes = [CustomTokenAuthentication]
-    permission_classes = [IsAuthenticated]
-
     def get(self, request):
         supported_conversions = SupportedConversion.get_available_conversions_for_all_sources()
         return JsonResponse({'supported_conversions': supported_conversions})
-
-
-class IndexView(APIView):
-    authentication_classes = [CustomTokenAuthentication]
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-        return render(request, "documents/index.html")
