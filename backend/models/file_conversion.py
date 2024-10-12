@@ -37,15 +37,17 @@ class DocumentConversion(models.Model):
 
     def to_dict(self):
         return {
-            'original_file': str(self.original_file),
-            'original_filename': self.original_filename,
-            'original_mimetype': self.original_mimetype,
-            'original_size': self.original_size,
-            'converted_file': str(self.converted_file),
-            'converted_mimetype': self.converted_mimetype,
-            'converted_size': self.converted_size,
-            'created_at': self.created_at,
-            'completed_at': self.completed_at,
+            'original_file': {
+                'source_url': self.original_file.url,
+                'filename': self.original_filename,
+                'original_mimetype': self.original_mimetype,
+                'original_size': str(self.original_size),
+            },
+            'converted_file': {
+                'source_url': self.converted_file.url,
+                'converted_mimetype': self.converted_mimetype,
+                'converted_size': str(self.converted_size),
+            },
             'error_message': self.error_message,
             'status': self.status,
         }

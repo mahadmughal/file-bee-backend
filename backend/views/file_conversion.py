@@ -50,13 +50,9 @@ class UploadAndCreateDocumentView(APIView):
         converted_file = document_conversion.converted_file
 
         if converted_file:
-            return JsonResponse({
-                'converted_file': {
-                    'url': converted_file.url,
-                    'file_name': document_conversion.converted_filename,
-                    'mime_type': document_conversion.converted_mimetype,
-                }
-            }, status=200)
+            return JsonResponse(
+                document_conversion.to_dict(), status=200
+            )
         else:
             return JsonResponse({'error': 'unable to convert file'}, status=500)
 
