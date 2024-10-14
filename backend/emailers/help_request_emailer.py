@@ -18,17 +18,17 @@ class HelpRequestEmailer:
             'subject': self.help_request.subject,
             'description': self.help_request.description,
             'request_id': self.help_request.id,
-            'created_at': self.help_request.created_at
+            'created_at': self.help_request.created_at,
+            'attachment_link': self.help_request.attachment.url,
         }
 
         message = render_to_string(
             'emails/help_request_confirmation.html', context)
+
         email = EmailMessage(
             subject,
             message,
             self.email_from,
             [self.help_request.email]
         )
-        if self.help_request.attachment:
-            email.attach_file(self.help_request.attachment.path)
         email.send()

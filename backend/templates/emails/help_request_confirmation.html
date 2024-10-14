@@ -1,7 +1,23 @@
-Dear customer,
+Help Request Confirmation
 
-We have received your request. Thank you for reaching out to us. We will update ASAP.
+Dear {{ email }},
+
+We have received your help request with the following details:
+
+Subject: {{ subject }}
+Request ID: {{ request_id }}
+Submitted on: {{ created_at }}
+
+Description:
+{{ description }}
+
+{% if attachment_link %}
+You have included an attachment:
+
+File link: {{ attachment_link }}
+{% endif %}
+
+We will review your request and get back to you as soon as possible.
 
 Thanks,
-
 The FileBee Team

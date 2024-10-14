@@ -1,3 +1,4 @@
+from django.core.files import File
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from rest_framework import status
@@ -5,7 +6,6 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from backend.models.help_request import HelpRequest
 from backend.emailers.help_request_emailer import HelpRequestEmailer
-import pdb
 
 
 class SubmitHelpRequestView(APIView):
@@ -27,12 +27,16 @@ class SubmitHelpRequestView(APIView):
                     "Email, subject, and description are required fields.")
 
             # Create HelpRequest instance
-            help_request = HelpRequest.objects.create(
+            help_request = HelpRequest(
                 email=email,
                 subject=subject,
-                description=description,
-                attachment=attachment
+                description=description
             )
+
+            if attachment:
+                help_request.attachment.save(attachment.name, File(attachment))
+
+            help_request.save()
 
             HelpRequestEmailer(help_request).send_confirmation_email()
 
