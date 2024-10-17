@@ -18,6 +18,7 @@ class ImageConverter:
 
         if self.is_png_to_jpeg():
             image = image.convert('RGB')
+            return image
             image.save(output, 'JPEG', quality=95)
         elif self.is_jpeg_to_bmp() or self.is_png_to_bmp():
             image = image.convert(mode="P", palette=Image.ADAPTIVE, colors=256)
@@ -63,15 +64,6 @@ class ImageConverter:
         pdf_canvas.save()
 
         return buffer
-
-    # TODO: not functional, have to confirm whether to remove this method.
-    def generate_output_file_path(self, target_extension=None):
-        file_directory = os.path.dirname(self.file.name)
-        file_name = os.path.basename(self.file.name)
-        target_extension = target_extension if target_extension else self.target_mimetype.split(
-            '/')[-1]
-
-        return (file_directory + '/' + file_name.split('.')[0] + '.' + target_extension).replace('uploaded', 'converted')
 
     def get_image_from_s3(self):
         file_content = s3_client.get_object(self.file.name)

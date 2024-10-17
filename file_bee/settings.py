@@ -130,7 +130,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
@@ -144,14 +143,7 @@ USE_L10N = True
 
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/3.2/howto/static-files/
-
 STATIC_URL = '/media/'
-
-# Default primary key field type
-# https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -183,11 +175,10 @@ DOMAIN_BASE_URL = config('DOMAIN_BASE_URL')
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = config('EMAIL_HOST')
 EMAIL_USE_TLS = True
-# EMAIL_USE_SSL = True
 EMAIL_PORT = config('EMAIL_PORT')
 EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
-# EMAIL_HOST_PASSWORD = 'denizenfromgmail'
+# EMAIL_USE_SSL = True
 
 # AWS S3 Configuration
 AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
@@ -201,4 +192,21 @@ AWS_DEFAULT_ACL = None
 BUGSNAG = {
     'api_key': config('BUGSNAG_API_KEY'),
     'project_root': BASE_DIR,
+}
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+
+    'root': {
+        'level': 'ERROR',
+        'handlers': ['bugsnag'],
+    },
+
+    'handlers': {
+        'bugsnag': {
+            'level': 'INFO',
+            'class': 'bugsnag.handlers.BugsnagHandler',
+        },
+    }
 }

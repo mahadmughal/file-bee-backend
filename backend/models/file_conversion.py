@@ -3,6 +3,7 @@ from backend.converters.mimetype_converter import MimetypeConverter
 import datetime
 from django.conf import settings
 from storages.backends.s3boto3 import S3Boto3Storage
+import bugsnag
 
 
 class DocumentConversion(models.Model):
@@ -53,24 +54,40 @@ class DocumentConversion(models.Model):
         }
 
     def conversion(self):
-        mimetype_converter = MimetypeConverter(
-            self.original_mimetype, self.converted_mimetype, self.original_file)
-        converted_file = mimetype_converter.convert()
+        try:
+            mimetype_converter = MimetypeConverter(
+                self.original_mimetype, self.converted_mimetype, self.original_file)
+            converted_file = mimetype_converter.convert()
 
-        supported_conversion = SupportedConversion.objects.filter(
-            original_mimetype=self.original_mimetype,
-            target_mimetype=self.converted_mimetype,
-            available=True
-        ).first()
+            # Save the converted file
+            self.converted_file.save(
+                self.converted_filename, converted_file, save=False)
 
-        self.converted_filename = f"{self.original_filename.rsplit(
-            '.')[0]}.{supported_conversion.target_extension}"
+            # Update model fields
+            self.converted_filename = self.converted_file.name.split('/')[-1]
+            self.converted_size = self.converted_file.size
+            self.completed_at = datetime.datetime
+            self.status = 'completed'
+            self.save()
 
-        self.converted_file.save(
-            self.converted_filename, converted_file, save=False)
-        self.completed_at = datetime.datetime.now()
-        self.status = 'completed'
-        self.save()
+        except Exception as e:
+            # Log the error
+            self.status = 'failed'
+            self.error_message = str(e)
+            self.save()
+
+            # Report the error to Bugsnag
+            bugsnag.notify(
+                e,
+                metadata={
+                    "document_conversion": {
+                        "id": self.id,
+                        "original_mimetype": self.original_mimetype,
+                        "converted_mimetype": self.converted_mimetype,
+                        "original_filename": self.original_filename,
+                    }
+                }
+            )
 
 
 class SupportedConversion(models.Model):
