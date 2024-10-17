@@ -36,18 +36,45 @@ class DocumentConversion(models.Model):
         null=True
     )
 
+    def __get_file_size_info(self):
+
+        if self.converted_file:
+            size_in_bytes = self.converted_file.size
+
+            # Convert to KB
+            size_in_kb = size_in_bytes / 1024
+
+            # Less than 1 MB
+            if size_in_kb < 1024:
+                return f"{round(size_in_kb, 2)} KB"
+
+            # Convert to MB
+            size_in_mb = size_in_kb / 1024
+
+            # Between 1 MB and 100 MB
+            if size_in_mb < 100:
+                return f"{round(size_in_mb, 2)} MB"
+
+            # Convert to GB
+            size_in_gb = size_in_mb / 1024
+
+            # 100 MB or more
+            return f"{round(size_in_gb, 2)} GB"
+
+        return ''
+
     def to_dict(self):
         return {
             'original_file': {
                 'source_url': self.original_file.url,
                 'filename': self.original_filename,
                 'original_mimetype': self.original_mimetype,
-                'original_size': str(self.original_size),
+                'original_size': self.__get_file_size_info(),
             },
             'converted_file': {
                 'source_url': self.converted_file.url,
                 'converted_mimetype': self.converted_mimetype,
-                'converted_size': str(self.converted_size),
+                'converted_size': self.__get_file_size_info(),
             },
             'error_message': self.error_message,
             'status': self.status,
@@ -59,6 +86,15 @@ class DocumentConversion(models.Model):
                 self.original_mimetype, self.converted_mimetype, self.original_file)
             converted_file = mimetype_converter.convert()
 
+            supported_conversion = SupportedConversion.objects.filter(
+                original_mimetype=self.original_mimetype,
+                target_mimetype=self.converted_mimetype,
+                available=True
+            ).first()
+
+            self.converted_filename = f"{self.original_filename.rsplit(
+                '.')[0]}.{supported_conversion.target_extension}"
+
             # Save the converted file
             self.converted_file.save(
                 self.converted_filename, converted_file, save=False)
@@ -66,7 +102,7 @@ class DocumentConversion(models.Model):
             # Update model fields
             self.converted_filename = self.converted_file.name.split('/')[-1]
             self.converted_size = self.converted_file.size
-            self.completed_at = datetime.datetime
+            self.completed_at = datetime.datetime.now()
             self.status = 'completed'
             self.save()
 
