@@ -8,6 +8,7 @@ bleach==6.1.0
 boto3==1.35.19
 botocore==1.35.19
 Brotli==1.1.0
+bugsnag==4.7.1
 certifi==2024.6.2
 chardet==5.2.0
 charset-normalizer==3.3.2
@@ -92,6 +93,7 @@ urllib3==2.2.1
 virtualenv==20.26.5
 wcwidth==0.2.13
 webencodings==0.5.1
+WebOb==1.8.8
 wheel==0.43.0
 whitenoise==6.7.0
 woff2otf==1.0.1
