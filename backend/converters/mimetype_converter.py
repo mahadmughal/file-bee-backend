@@ -28,18 +28,3 @@ class MimetypeConverter:
             document_converter = DocumentConverter(
                 self.source_mimetype, self.target_mimetype, self.file)
             return document_converter.convert()
-
-    def generate_output_file_path(self, target_extension=None):
-        # Get the directory part of the original file path
-        file_directory = os.path.dirname(self.file.name)
-
-        # Get the filename part of the original file path
-        file_name = os.path.basename(self.file.path)
-        target_extension = target_extension if target_extension else self.target_mimetype.split(
-            '/')[-1]
-
-        # Construct the output file path in the same directory with a different extension
-        return (file_directory + '/' + file_name.split('.')[0] + '.' + target_extension).replace('uploaded', 'converted')
-
-    # def generate_output_file_path(self):
-        # return f"{self.file.path.split('.')[0]}.{self.target_mimetype.split('/')[-1]}".replace('uploaded', 'converted')
