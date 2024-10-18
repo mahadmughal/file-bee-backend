@@ -17,7 +17,6 @@ from datetime import timedelta
 from rest_framework import status
 from django.db import transaction
 from backend.models.file_conversion import DocumentConversion
-import pdb
 
 
 class UserRegistration(generics.CreateAPIView):

@@ -5,6 +5,7 @@ from django.core.files.base import ContentFile
 from backend.utils.s3_utils import s3_client
 from docx import Document
 from docx.shared import Inches
+from reportlab.lib.utils import ImageReader
 
 
 class ImageConverter:
@@ -46,6 +47,8 @@ class ImageConverter:
             image.save(output, 'WEBP')
         elif self.is_gif_to_bmp():
             image.save(output, 'BMP')
+        elif self.is_gif_to_pdf():
+            output = self.convert_gif_to_pdf(image)
         elif self.is_png_to_pdf():
             output = self.convert_image_to_pdf(image)
         elif self.is_jpeg_to_pdf():
@@ -101,6 +104,37 @@ class ImageConverter:
         doc_stream.seek(0)
 
         return doc_stream
+
+    def convert_gif_to_pdf(self, input_image):
+        width, height = input_image.size
+
+        # Create a new PDF with ReportLab
+        pdf_buffer = BytesIO()
+        c = canvas.Canvas(pdf_buffer, pagesize=(width, height))
+
+        # Loop over all frames in the GIF
+        for frame in range(0, input_image.n_frames):
+            input_image.seek(frame)
+            # Convert each frame to RGB (PDF doesn't support transparency)
+            rgb_frame = Image.new('RGB', input_image.size, (255, 255, 255))
+            rgb_frame.paste(input_image, (0, 0),
+                            input_image.convert('RGBA'))
+
+            # Save the frame as a temporary PNG
+            temp_buffer = BytesIO()
+            rgb_frame.save(temp_buffer, format='PNG')
+            temp_buffer.seek(0)
+
+            # Add the frame to the PDF
+            img_reader = ImageReader(temp_buffer)
+            c.drawImage(img_reader, 0, 0, width, height)
+            c.showPage()
+
+        c.save()
+
+        pdf_buffer.seek(0)
+
+        return pdf_buffer
 
     def get_image_from_s3(self):
         file_content = s3_client.get_object(self.file.name)
@@ -172,3 +206,6 @@ class ImageConverter:
 
     def is_gif_to_bmp(self):
         return self.source_mimetype == 'image/gif' and self.target_mimetype == 'image/bmp'
+
+    def is_gif_to_pdf(self):
+        return self.source_mimetype == 'image/gif' and self.target_mimetype == 'application/pdf'
