@@ -1,9 +1,10 @@
 from PIL import Image
 from reportlab.pdfgen import canvas
-import os
 from io import BytesIO
 from django.core.files.base import ContentFile
 from backend.utils.s3_utils import s3_client
+from docx import Document
+from docx.shared import Inches
 
 
 class ImageConverter:
@@ -51,8 +52,23 @@ class ImageConverter:
             output = self.convert_image_to_pdf(image)
         elif self.is_webp_to_pdf():
             output = self.convert_image_to_pdf(image)
+        elif self.is_png_to_doc() or self.is_png_to_docx():
+            output = self.convert_image_to_document(image, 'PNG')
+        elif self.is_jpeg_to_doc() or self.is_jpeg_to_docx():
+            output = self.convert_image_to_document(image, 'JPEG')
+        elif self.is_webp_to_doc() or self.is_webp_to_docx():
+            input_image = self.convert_webp_to_png(image)
+            output = self.convert_image_to_document(input_image, 'PNG')
 
         return ContentFile(output.getvalue())
+
+    def convert_webp_to_png(self, input_image):
+        png_image = BytesIO()
+        input_image.save(png_image, format='PNG')
+        png_image.seek(0)
+        input_image = Image.open(png_image)
+
+        return input_image
 
     def convert_image_to_pdf(self, input_image):
         print('Converting image to PDF...')
@@ -63,6 +79,28 @@ class ImageConverter:
         pdf_canvas.save()
 
         return buffer
+
+    def convert_image_to_document(self, input_image, input_image_extension):
+        doc = Document()
+
+        width, height = input_image.size
+        aspect_ratio = width / height
+
+        max_width = Inches(6)
+
+        doc_width = max_width
+        doc_height = max_width / aspect_ratio
+
+        byte_stream = BytesIO()
+        input_image.save(byte_stream, format=input_image_extension)
+        byte_stream.seek(0)
+
+        doc.add_picture(byte_stream, width=doc_width, height=doc_height)
+        doc_stream = BytesIO()
+        doc.save(doc_stream)
+        doc_stream.seek(0)
+
+        return doc_stream
 
     def get_image_from_s3(self):
         file_content = s3_client.get_object(self.file.name)
@@ -81,6 +119,12 @@ class ImageConverter:
     def is_png_to_pdf(self):
         return self.source_mimetype == 'image/png' and self.target_mimetype == 'application/pdf'
 
+    def is_png_to_doc(self):
+        return self.source_mimetype == 'image/png' and self.target_mimetype == 'application/msword'
+
+    def is_png_to_docx(self):
+        return self.source_mimetype == 'image/png' and self.target_mimetype == 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+
     def is_jpeg_to_bmp(self):
         return self.source_mimetype == 'image/jpeg' and self.target_mimetype == 'image/bmp'
 
@@ -93,6 +137,12 @@ class ImageConverter:
     def is_jpeg_to_pdf(self):
         return self.source_mimetype == 'image/jpeg' and self.target_mimetype == 'application/pdf'
 
+    def is_jpeg_to_doc(self):
+        return self.source_mimetype == 'image/jpeg' and self.target_mimetype == 'application/msword'
+
+    def is_jpeg_to_docx(self):
+        return self.source_mimetype == 'image/jpeg' and self.target_mimetype == 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+
     def is_webp_to_png(self):
         return self.source_mimetype == 'image/webp' and self.target_mimetype == 'image/png'
 
@@ -104,6 +154,12 @@ class ImageConverter:
 
     def is_webp_to_pdf(self):
         return self.source_mimetype == 'image/webp' and self.target_mimetype == 'application/pdf'
+
+    def is_webp_to_doc(self):
+        return self.source_mimetype == 'image/webp' and self.target_mimetype == 'application/msword'
+
+    def is_webp_to_docx(self):
+        return self.source_mimetype == 'image/webp' and self.target_mimetype == 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
 
     def is_gif_to_png(self):
         return self.source_mimetype == 'image/gif' and self.target_mimetype == 'image/png'
