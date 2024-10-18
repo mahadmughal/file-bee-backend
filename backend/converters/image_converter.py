@@ -18,7 +18,6 @@ class ImageConverter:
 
         if self.is_png_to_jpeg():
             image = image.convert('RGB')
-            return image
             image.save(output, 'JPEG', quality=95)
         elif self.is_jpeg_to_bmp() or self.is_png_to_bmp():
             image = image.convert(mode="P", palette=Image.ADAPTIVE, colors=256)
