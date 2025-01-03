@@ -11,7 +11,7 @@ from django.http import FileResponse, JsonResponse
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from backend.models.user import PasswordReset, CustomToken
-from backend.emailers.password_reset_emailer import PasswordResetEmailer
+from backend.mailers.password_reset_emailer import PasswordResetEmailer
 from django.utils import timezone
 from datetime import timedelta
 from rest_framework import status
