@@ -5,7 +5,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from backend.models.help_request import HelpRequest
-from backend.emailers.help_request_emailer import HelpRequestEmailer
+from backend.mailers.help_request_emailer import HelpRequestEmailer
 
 
 class SubmitHelpRequestView(APIView):
