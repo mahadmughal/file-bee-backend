@@ -2,6 +2,7 @@ from django.urls import path
 
 from backend.views.help_request import SubmitHelpRequestView
 from backend.views.ocr import OCRView
+from backend.views.ocr_conversions import OCRSupportedConversionsView, OCRTargetFormatsView
 
 from .views import *
 
@@ -26,4 +27,8 @@ urlpatterns = [
     path('send_help_request/', SubmitHelpRequestView.as_view(),
          name='send_help_request'),
     path('ocr/', OCRView.as_view(), name='ocr_view'),
+    path('ocr/supported_conversions/', OCRSupportedConversionsView.as_view(),
+         name='ocr_supported_conversions'),
+    path('ocr/target_formats/<path:source_mimetype>/', OCRTargetFormatsView.as_view(),
+         name='ocr_target_formats'),
 ]
