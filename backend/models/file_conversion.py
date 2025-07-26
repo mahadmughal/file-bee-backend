@@ -132,6 +132,7 @@ class SupportedConversion(models.Model):
     original_extension = models.CharField(max_length=50, null=True)
     target_extension = models.CharField(max_length=50, null=True)
     available = models.BooleanField(default=True)
+    ocr_enabled = models.BooleanField(default=False)
 
     class Meta:
         unique_together = (
@@ -152,10 +153,31 @@ class SupportedConversion(models.Model):
         )
 
     @classmethod
+    def is_ocr_conversion_available(cls, original_mimetype, target_mimetype):
+        return cls.objects.filter(
+            original_mimetype=original_mimetype,
+            target_mimetype=target_mimetype,
+            available=True,
+            ocr_enabled=True
+        )
+        
+    @classmethod
+    def ocr_enabled_conversions(cls):
+        return cls.objects.filter(available=True, ocr_enabled=True)
+
+    @classmethod
     def get_available_conversions_for_source(cls, original_mimetype):
         return cls.objects.filter(
             original_mimetype__contains=original_mimetype,
             available=True
+        ).values_list("target_mimetype", flat=True)
+
+    @classmethod
+    def get_ocr_conversions_for_source(cls, original_mimetype):
+        return cls.objects.filter(
+            original_mimetype__contains=original_mimetype,
+            available=True,
+            ocr_enabled=True
         ).values_list("target_mimetype", flat=True)
 
     @classmethod
@@ -196,4 +218,4 @@ class SupportedConversion(models.Model):
         return None
 
     def __str__(self):
-        return f"original_mimetype={self.original_mimetype}, target_mimetype={self.target_mimetype}, original_extension={self.original_extension}, target_extension={self.target_extension}, available={self.available}"
+        return f"original_mimetype={self.original_mimetype}, target_mimetype={self.target_mimetype}, original_extension={self.original_extension}, target_extension={self.target_extension}, available={self.available}, ocr_enabled={self.ocr_enabled}"

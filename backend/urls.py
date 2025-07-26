@@ -1,6 +1,7 @@
 from django.urls import path
 
 from backend.views.help_request import SubmitHelpRequestView
+from backend.views.ocr import OCRView
 
 from .views import *
 
@@ -24,4 +25,5 @@ urlpatterns = [
          name='target_conversions'),
     path('send_help_request/', SubmitHelpRequestView.as_view(),
          name='send_help_request'),
+    path('ocr/', OCRView.as_view(), name='ocr_view'),
 ]
